@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aether Design System 3.0</title>
+
+    <!-- Tailwind CSS (reusing the local script or fallback) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Three.js for Hero Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    fontFamily: { sans: ["Inter", "sans-serif"], mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"] },
+                    colors: {
+                        bgDark: "#020202",
+                        surfaceDark: "#0a0a0a",
+                        borderDark: "rgba(255, 255, 255, 0.06)",
+                        textDark: "#EAEAEA",
+                        bgLight: "#F3F4F6",
+                        surfaceLight: "#FFFFFF",
+                        borderLight: "rgba(0, 0, 0, 0.08)",
+                        textLight: "#1F2937",
+                        accent: "#10B981",
+                        accentGlow: "#34D399",
+                    },
+                    animation: {
+                        beam: "beam 3s linear infinite",
+                        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                        "spin-slow": "spin 8s linear infinite",
+                        "bounce-slow": "bounce 3s infinite",
+                    },
+                    keyframes: {
+                        beam: {
+                            "0%": { strokeDashoffset: "1000" },
+                            "100%": { strokeDashoffset: "0" },
+                        },
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style>
+        body {
+            transition: background-color 0.5s ease, color 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        .dark body {
+            background-color: #020202;
+            color: #eaeaea;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+
+        /* Glassmorphism Classes */
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .dark .glass {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .light-glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        /* Canvas */
+        #ds-canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 0;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        /* Text Utils */
+        .text-gradient-green {
+            background: linear-gradient(135deg, #6ee7b7, #10b981, #059669);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .text-hollow {
+            background-color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+            color: transparent;
+        }
+
+        .dark .text-hollow {
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Hero Glow */
+        .hero-glow {
+            position: absolute;
+            width: 820px;
+            height: 820px;
+            border-radius: 9999px;
+            pointer-events: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            filter: blur(70px);
+            opacity: 1;
+            background: radial-gradient(circle at 45% 40%, rgba(16, 185, 129, 0.18) 0%, rgba(16, 185, 129, 0.06) 38%, transparent 70%),
+                radial-gradient(circle at 55% 60%, rgba(255, 255, 255, 0.06) 0%, transparent 55%);
+            z-index: -1;
+        }
+
+        .section-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 9999px;
+            pointer-events: none;
+            filter: blur(90px);
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+            z-index: 0;
+        }
+
+        /* Grid Backgrounds */
+        .bg-grid {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 80px 80px;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            position: relative;
+            overflow: hidden;
+            background: #10B981;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.25), 0 1px 3px rgba(0, 0, 0, 0.2);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-primary::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #34D399;
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.4), 0 2px 5px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:hover::after {
+            opacity: 1;
+        }
+
+        /* Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Spec Tables */
+        .spec-table th {
+            text-align: left;
+            padding: 12px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #10b981;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .spec-table td {
+            padding: 16px 12px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #9CA3AF;
+        }
+
+        /* Components Box */
+        .component-box {
+            background: linear-gradient(180deg, rgba(20, 20, 20, 0.65), rgba(8, 8, 8, 0.75));
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            transition: transform 450ms, border-color 450ms;
+        }
+
+        .component-box:hover {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        /* Inputs */
+        .ds-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .ds-input:focus {
+            border-color: #10B981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            background: rgba(16, 185, 129, 0.02);
+        }
+
+        /* Loaders & Setup */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #020202;
+            color: #eaeaea;
+            transition: opacity 1s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .anim-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-accent/30 selection:text-accent relative bg-grid">
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="text-[10px] uppercase text-emerald-400 font-semibold tracking-[0.2em] mb-4 animate-pulse">
+            Compiling Design System 3.0
+        </div>
+        <div class="w-64 h-[2px] bg-gray-800 rounded-full overflow-hidden relative">
+            <div id="loader-fill"
+                class="absolute top-0 left-0 h-full bg-accent transition-all duration-100 ease-out rounded-full shadow-[0_0_10px_#10B981]"
+                style="width: 0%"></div>
+        </div>
+        <div id="loader-text" class="mt-4 text-[10px] font-mono text-gray-500">0%</div>
+    </div>
+
+    <!-- 3D Canvas Background -->
+    <div id="ds-canvas-container"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-[#020202]/70 backdrop-blur-2xl border-b border-white/[0.04]">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-6 h-6 bg-accent rounded-md flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+                    <div class="w-2 h-2 bg-white rounded-full"></div>
+                </div>
+                <span class="font-semibold tracking-[0.05em] text-white text-base">
+                    Aether DS 3.0
+                </span>
+            </div>
+            <div class="hidden md:flex items-center gap-8 text-[13px] font-medium text-neutral-400">
+                <a href="#typography" class="hover:text-white transition-colors duration-300">Typography</a>
+                <a href="#colors" class="hover:text-white transition-colors duration-300">Colors</a>
+                <a href="#components" class="hover:text-white transition-colors duration-300">Components</a>
+                <a href="#animations" class="hover:text-white transition-colors duration-300">Animations</a>
+            </div>
+            <div class="flex gap-4">
+                <button id="theme-toggle"
+                    class="p-2 rounded-full hover:bg-white/5 transition-colors duration-300 text-neutral-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                </button>
+                <button
+                    class="px-5 py-2 text-[13px] font-semibold bg-white text-black rounded-full hover:scale-[1.05] transition-transform duration-300">
+                    Get Source
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative z-10 pt-32 pb-40 px-6 max-w-7xl mx-auto space-y-40">
+
+        <!-- ==============================================
+             HERO - THE FIRST FOLD DEMO
+        =============================================== -->
+        <section id="hero" class="relative min-h-[85vh] flex flex-col items-center justify-center text-center">
+            <div class="hero-glow"></div>
+
+            <div
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-accent/20 bg-accent/5 backdrop-blur-md mb-8 reveal shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                <span class="w-2 h-2 rounded-full bg-accent animate-pulse-slow"></span>
+                <span class="text-xs font-semibold text-accent uppercase tracking-[0.2em]">Design System 3.0</span>
+            </div>
+
+            <h1 class="text-6xl md:text-[7rem] font-bold tracking-tighter mb-6 leading-[1.0] text-white reveal"
+                style="transition-delay: 100ms;">
+                <span class="text-hollow block mb-2">Architecting</span>
+                <span class="text-gradient-green">Digital Matter.</span>
+            </h1>
+
+            <p class="text-lg text-neutral-400 max-w-2xl mx-auto mb-12 font-light reveal leading-relaxed"
+                style="transition-delay: 200ms;">
+                A comprehensive showcase of Aether’s visual architecture. Out of the box, offering extreme modularity
+                via atomic design, glassmorphic depths, and seamless interaction flows.
+            </p>
+
+            <div class="flex gap-4 reveal" style="transition-delay: 300ms;">
+                <button
+                    class="btn-primary h-14 px-10 rounded-full text-[15px] font-semibold flex items-center justify-center gap-3">
+                    Explore Components
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Floating demo elements around hero -->
+            <div class="absolute w-full h-full inset-0 pointer-events-none z-[-1]">
+                <div
+                    class="absolute top-[20%] left-[5%] p-4 glass rounded-2xl w-48 rotate-[-5deg] anim-float opacity-70">
+                    <div class="w-8 h-8 rounded bg-accent/20 mb-3 flex items-center justify-center text-accent"><svg
+                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg></div>
+                    <div class="h-2 w-full bg-white/10 rounded mb-2"></div>
+                    <div class="h-2 w-2/3 bg-white/10 rounded"></div>
+                </div>
+                <div class="absolute bottom-[20%] right-[5%] p-4 glass rounded-2xl w-56 rotate-[3deg] anim-float opacity-70"
+                    style="animation-delay: 1.5s;">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-accent to-[#059669]"></div>
+                        <div>
+                            <div class="h-2 w-16 bg-white/20 rounded mb-1.5"></div>
+                            <div class="h-1.5 w-10 bg-white/10 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==============================================
+             TYPOGRAPHY
+        =============================================== -->
+        <section id="typography" class="relative">
+            <div class="section-glow" style="top: -100px; left: -200px;"></div>
+
+            <div class="mb-16 reveal">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] mb-4 text-emerald-400">Foundation</p>
+                <h2 class="text-4xl font-semibold tracking-tight text-white mb-4">Typography</h2>
+                <p class="text-neutral-400 max-w-xl font-light">Global font configuration, scale and line heights
+                    designed for high-density dashboards and immersive landing pages.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-10 reveal">
+                <div class="lg:col-span-4 component-box flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-2">Inter</h3>
+                        <p class="text-sm text-neutral-500 mb-6 font-mono text-[11px] uppercase tracking-wider">Primary
+                            Stack</p>
+                        <ul class="space-y-4 font-light text-sm text-neutral-400 mb-8">
+                            <li><span class="text-white font-medium mr-2">Weights:</span> 300, 400, 500, 600, 700</li>
+                            <li><span class="text-white font-medium mr-2">Method:</span> Google Fonts CDN</li>
+                            <li><span class="text-white font-medium mr-2">Fallback:</span> sans-serif, system-ui</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="text-[6rem] leading-none font-bold text-white tracking-tighter opacity-10">Aa</div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-8 overflow-x-auto component-box p-0">
+                    <table class="w-full spec-table whitespace-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>Size</th>
+                                <th>Weight</th>
+                                <th>Line Height</th>
+                                <th>Letter Spacing</th>
+                                <th>Sample</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code class="text-accent bg-accent/10 px-2 py-1 rounded">h1</code></td>
+                                <td>72px / 4.5rem</td>
+                                <td>Bold (700)</td>
+                                <td>1.0</td>
+                                <td>-0.05em</td>
+                                <td class="text-white text-5xl font-bold tracking-tighter">Heading 1</td>
+                            </tr>
+                            <tr>
+                                <td><code class="text-accent bg-accent/10 px-2 py-1 rounded">h2</code></td>
+                                <td>48px / 3rem</td>
+                                <td>Semibold (600)</td>
+                                <td>1.2</td>
+                                <td>-0.03em</td>
+                                <td class="text-white text-4xl font-semibold tracking-tight">Heading 2</td>
+                            </tr>
+                            <tr>
+                                <td><code class="text-accent bg-accent/10 px-2 py-1 rounded">h3</code></td>
+                                <td>32px / 2rem</td>
+                                <td>Semibold (600)</td>
+                                <td>1.3</td>
+                                <td>-0.02em</td>
+                                <td class="text-white text-3xl font-semibold tracking-tight">Heading 3</td>
+                            </tr>
+                            <tr>
+                                <td><code class="text-accent bg-accent/10 px-2 py-1 rounded">h4</code></td>
+                                <td>24px / 1.5rem</td>
+                                <td>Medium (500)</td>
+                                <td>1.4</td>
+                                <td>-0.01em</td>
+                                <td class="text-white text-xl font-medium tracking-tight">Heading 4</td>
+                            </tr>
+                            <tr>
+                                <td><code class="text-accent bg-accent/10 px-2 py-1 rounded">body-lg</code></td>
+                                <td>18px / 1.125rem</td>
+                                <td>Regular (400)</td>
+                                <td>1.6</td>
+                                <td>Normal</td>
+                                <td class="text-neutral-300 text-lg">The quick brown fox.</td>
+                            </tr>
+                            <tr>
+                                <td><code class="text-accent bg-accent/10 px-2 py-1 rounded">body</code></td>
+                                <td>16px / 1rem</td>
+                                <td>Light (300)</td>
+                                <td>1.6</td>
+                                <td>Normal</td>
+                                <td class="text-neutral-400 text-base font-light">The quick brown fox.</td>
+                            </tr>
+                            <tr>
+                                <td><code class="text-accent bg-accent/10 px-2 py-1 rounded">body-sm</code></td>
+                                <td>14px / 0.875rem</td>
+                                <td>Regular (400)</td>
+                                <td>1.5</td>
+                                <td>0.01em</td>
+                                <td class="text-neutral-500 text-sm">The quick brown fox.</td>
+                            </tr>
+                            <tr>
+                                <td><code class="text-accent bg-accent/10 px-2 py-1 rounded">caption</code></td>
+                                <td>11px / 0.6875rem</td>
+                                <td>Semibold (600)</td>
+                                <td>1.0</td>
+                                <td>0.2em (uppercase)</td>
+                                <td class="text-emerald-400 text-[11px] font-semibold uppercase tracking-[0.2em]">
+                                    Metadata</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==============================================
+             COLORS
+        =============================================== -->
+        <section id="colors" class="relative">
+            <div class="mb-16 reveal">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] mb-4 text-emerald-400">Foundation</p>
+                <h2 class="text-4xl font-semibold tracking-tight text-white mb-4">Color System</h2>
+                <p class="text-neutral-400 max-w-xl font-light">A precision-tuned dark palette with deep blacks and
+                    vibrant emerald accents, ensuring perfect AA/AAA contrast ratios.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 reveal">
+                <!-- Deep Background -->
+                <div class="component-box p-6 flex flex-col group hover:-translate-y-2 transition-transform">
+                    <div class="w-full h-24 rounded-xl bg-[#020202] border border-white/10 mb-5 shadow-inner"></div>
+                    <h4 class="text-white font-semibold text-base mb-1">Background Dark</h4>
+                    <p class="text-xs text-neutral-500 mb-3 uppercase tracking-wider font-mono">Neutral / Base</p>
+                    <div class="space-y-1.5 text-xs font-mono text-neutral-400 mb-4">
+                        <div class="flex justify-between"><span>HEX</span><span class="text-white">#020202</span></div>
+                        <div class="flex justify-between"><span>RGB</span><span class="text-white">2, 2, 2</span></div>
+                        <div class="flex justify-between"><span>HSL</span><span class="text-white">0, 0%, 1%</span>
+                        </div>
+                    </div>
+                    <div class="h-px w-full bg-white/10 my-3"></div>
+                    <p class="text-xs text-neutral-500 line-clamp-2">Main application background. Used behind all
+                        surfaces.</p>
+                </div>
+
+                <!-- Surface -->
+                <div class="component-box p-6 flex flex-col group hover:-translate-y-2 transition-transform">
+                    <div class="w-full h-24 rounded-xl bg-[#0a0a0a] border border-white/10 mb-5 shadow-inner"></div>
+                    <h4 class="text-white font-semibold text-base mb-1">Surface Dark</h4>
+                    <p class="text-xs text-neutral-500 mb-3 uppercase tracking-wider font-mono">Neutral / Card</p>
+                    <div class="space-y-1.5 text-xs font-mono text-neutral-400 mb-4">
+                        <div class="flex justify-between"><span>HEX</span><span class="text-white">#0A0A0A</span></div>
+                        <div class="flex justify-between"><span>RGB</span><span class="text-white">10, 10, 10</span>
+                        </div>
+                        <div class="flex justify-between"><span>HSL</span><span class="text-white">0, 0%, 4%</span>
+                        </div>
+                    </div>
+                    <div class="h-px w-full bg-white/10 my-3"></div>
+                    <p class="text-xs text-neutral-500 line-clamp-2">Elevated surfaces, modals, and dropdowns. Hover
+                        states use lighter opacities.</p>
+                </div>
+
+                <!-- Primary Accent -->
+                <div class="component-box p-6 flex flex-col group hover:-translate-y-2 transition-transform">
+                    <div
+                        class="w-full h-24 rounded-xl bg-[#10B981] border border-[#059669] mb-5 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                    </div>
+                    <h4 class="text-white font-semibold text-base mb-1">Accent Emerald</h4>
+                    <p class="text-xs text-neutral-500 mb-3 uppercase tracking-wider font-mono">Primary / Action</p>
+                    <div class="space-y-1.5 text-xs font-mono text-neutral-400 mb-4">
+                        <div class="flex justify-between"><span>HEX</span><span class="text-white">#10B981</span></div>
+                        <div class="flex justify-between"><span>RGB</span><span class="text-white">16, 185, 129</span>
+                        </div>
+                        <div class="flex justify-between"><span>HSL</span><span class="text-white">160, 84%, 39%</span>
+                        </div>
+                    </div>
+                    <div class="h-px w-full bg-white/10 my-3"></div>
+                    <p class="text-xs text-neutral-500 line-clamp-2">Primary buttons, active states, progress bars, and
+                        glowing effects.</p>
+                </div>
+
+                <!-- Accent Glow -->
+                <div class="component-box p-6 flex flex-col group hover:-translate-y-2 transition-transform">
+                    <div
+                        class="w-full h-24 rounded-xl bg-[#34D399] border border-[#10B981] mb-5 shadow-[0_0_30px_rgba(52,211,153,0.4)]">
+                    </div>
+                    <h4 class="text-white font-semibold text-base mb-1">Accent Glow</h4>
+                    <p class="text-xs text-neutral-500 mb-3 uppercase tracking-wider font-mono">Hover / Intense</p>
+                    <div class="space-y-1.5 text-xs font-mono text-neutral-400 mb-4">
+                        <div class="flex justify-between"><span>HEX</span><span class="text-white">#34D399</span></div>
+                        <div class="flex justify-between"><span>RGB</span><span class="text-white">52, 211, 153</span>
+                        </div>
+                        <div class="flex justify-between"><span>HSL</span><span class="text-white">158, 64%, 51%</span>
+                        </div>
+                    </div>
+                    <div class="h-px w-full bg-white/10 my-3"></div>
+                    <p class="text-xs text-neutral-500 line-clamp-2">Button hovers, extreme highlights, and gradient
+                        stopping points.</p>
+                </div>
+            </div>
+
+            <!-- Gradient Demo -->
+            <div class="mt-8 component-box p-8 reveal flex flex-col md:flex-row items-center gap-8">
+                <div
+                    class="w-full md:w-1/2 h-32 rounded-2xl bg-gradient-to-r from-[#059669] via-[#10B981] to-[#34D399] shadow-[0_0_50px_rgba(16,185,129,0.2)]">
+                </div>
+                <div class="w-full md:w-1/2">
+                    <h4 class="text-white font-semibold text-lg mb-2 text-gradient-green">The Genesis Gradient</h4>
+                    <p class="text-neutral-400 text-sm font-light mb-4">A linear mapping traversing the primary color
+                        space. Applied to hero typography and premium element borders.</p>
+                    <code
+                        class="px-3 py-1.5 bg-black/50 border border-white/10 rounded font-mono text-xs text-emerald-400">linear-gradient(135deg, #6ee7b7, #10b981, #059669)</code>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==============================================
+             UI COMPONENTS
+        =============================================== -->
+        <section id="components" class="relative">
+            <div class="section-glow" style="bottom: -200px; right: -200px;"></div>
+
+            <div class="mb-16 reveal">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] mb-4 text-emerald-400">Library</p>
+                <h2 class="text-4xl font-semibold tracking-tight text-white mb-4">UI Components</h2>
+                <p class="text-neutral-400 max-w-xl font-light">Interactive primitives styled with the aesthetic
+                    language of Aether. Focused on animated micro-interactions and depth.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+
+                <!-- Buttons -->
+                <div class="component-box reveal">
+                    <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+                        <h3 class="text-xl font-semibold text-white">Buttons</h3>
+                        <span
+                            class="text-xs bg-white/5 border border-white/10 px-2 py-1 rounded text-neutral-400">Interactive</span>
+                    </div>
+
+                    <div class="flex flex-wrap gap-6 items-center mb-8">
+                        <div class="flex flex-col items-center gap-3">
+                            <button
+                                class="btn-primary h-12 px-8 rounded-full text-sm font-semibold flex items-center justify-center gap-2">
+                                Primary Action
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </button>
+                            <span class="text-xs font-mono text-neutral-500">.btn-primary</span>
+                        </div>
+
+                        <div class="flex flex-col items-center gap-3">
+                            <button
+                                class="h-12 px-8 rounded-full text-sm font-medium border border-white/10 bg-white/5 text-white hover:bg-white/10 transition-colors shadow-lg">
+                                Secondary
+                            </button>
+                            <span class="text-xs font-mono text-neutral-500">.btn-secondary</span>
+                        </div>
+
+                        <div class="flex flex-col items-center gap-3">
+                            <button
+                                class="h-12 w-12 rounded-full border border-white/10 bg-black/50 text-white flex items-center justify-center hover:bg-accent/10 hover:border-accent/40 hover:text-accent transition-all relative group">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                <div
+                                    class="absolute inset-0 rounded-full border border-accent animate-ping opacity-0 group-hover:opacity-100">
+                                </div>
+                            </button>
+                            <span class="text-xs font-mono text-neutral-500">Icon Button</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-black/40 rounded-lg p-4 border border-white/5">
+                        <pre class="text-xs font-mono text-neutral-400 overflow-x-auto"><code class="language-html">&lt;button class="btn-primary h-12 px-8 rounded-full text-sm font-semibold..."&gt;
+  Action
+&lt;/button&gt;</code></pre>
+                    </div>
+                </div>
+
+                <!-- Inputs & Controls -->
+                <div class="component-box reveal" style="transition-delay: 100ms;">
+                    <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+                        <h3 class="text-xl font-semibold text-white">Inputs & Badges</h3>
+                        <span
+                            class="text-xs bg-white/5 border border-white/10 px-2 py-1 rounded text-neutral-400">Forms</span>
+                    </div>
+
+                    <div class="space-y-6 mb-8">
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-2 uppercase tracking-wide">API
+                                Key</label>
+                            <div class="relative">
+                                <input type="text" placeholder="sk-live-..." class="ds-input focus:ring-0" />
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2">
+                                    <span
+                                        class="bg-accent/10 text-accent text-[10px] font-mono px-2 py-1 rounded border border-accent/20">VALID</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div
+                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-accent/20 bg-accent/5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span>
+                                <span
+                                    class="text-[10px] font-semibold text-accent uppercase tracking-widest">Active</span>
+                            </div>
+                            <div
+                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                <span
+                                    class="text-[10px] font-semibold text-blue-500 uppercase tracking-widest">Syncing</span>
+                            </div>
+                            <div
+                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-500/20 bg-neutral-500/5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-neutral-500"></span>
+                                <span
+                                    class="text-[10px] font-semibold text-neutral-400 uppercase tracking-widest">Offline</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-black/40 rounded-lg p-4 border border-white/5">
+                        <pre class="text-xs font-mono text-neutral-400 overflow-x-auto"><code class="language-html">&lt;input type="text" class="ds-input" placeholder="..." /&gt;
+&lt;!-- uses specific focus rings --&gt;</code></pre>
+                    </div>
+                </div>
+
+                <!-- Cards & Sections -->
+                <div class="component-box reveal lg:col-span-2">
+                    <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+                        <h3 class="text-xl font-semibold text-white">Cards & Overlays</h3>
+                        <span
+                            class="text-xs bg-white/5 border border-white/10 px-2 py-1 rounded text-neutral-400">Containers</span>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- Bento Style Card -->
+                        <div class="glass rounded-2xl p-6 relative overflow-hidden group">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                            </div>
+
+                            <div
+                                class="w-10 h-10 rounded-lg bg-black/40 border border-white/10 flex items-center justify-center mb-6 group-hover:border-accent/50 group-hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all">
+                                <svg class="w-5 h-5 text-neutral-400 group-hover:text-accent transition-colors"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h4 class="text-lg font-semibold text-white mb-2">Card Container</h4>
+                            <p class="text-sm text-neutral-400 font-light mb-4">Utilizes the `.glass` class for optical
+                                depth. Hover effects trigger soft borders and inner glows.</p>
+                            <div class="flex gap-2">
+                                <span
+                                    class="px-2 py-1 text-[10px] uppercase font-mono bg-black/30 rounded border border-white/5 text-neutral-300">Hoverable</span>
+                            </div>
+                        </div>
+
+                        <!-- Modal Simulator -->
+                        <div
+                            class="relative bg-black border border-white/10 rounded-2xl flex items-center justify-center p-8 overflow-hidden">
+                            <div class="absolute inset-0 bg-grid opacity-30"></div>
+
+                            <!-- Tooltip / Popover -->
+                            <div
+                                class="relative z-10 bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-xl shadow-2xl w-64 transform transition-transform hover:scale-105">
+                                <div class="text-[10px] font-bold text-accent uppercase tracking-widest mb-1">
+                                    Architecture</div>
+                                <div class="text-sm font-semibold text-white mb-2">Neural Lattice</div>
+                                <div class="text-xs text-neutral-400">Self-healing mesh topology with zero latency
+                                    synchronization.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==============================================
+             ICONS
+        =============================================== -->
+        <section id="icons" class="relative">
+            <div class="mb-16 reveal">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] mb-4 text-emerald-400">Library</p>
+                <h2 class="text-4xl font-semibold tracking-tight text-white mb-4">Iconography</h2>
+                <p class="text-neutral-400 max-w-xl font-light">Minimal, 1.5px stroke vector icons. Designed for clarity
+                    at 16px and elegance at 32px.</p>
+            </div>
+
+            <div class="component-box reveal">
+                <div class="grid grid-cols-4 md:grid-cols-8 gap-4">
+                    <!-- Icon item -->
+                    <div
+                        class="aspect-square flex flex-col items-center justify-center border border-white/5 hover:border-accent/40 hover:bg-accent/5 rounded-xl transition-all group cursor-pointer text-neutral-400 hover:text-accent">
+                        <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span class="text-[10px] font-mono">Zap</span>
+                    </div>
+                    <div
+                        class="aspect-square flex flex-col items-center justify-center border border-white/5 hover:border-accent/40 hover:bg-accent/5 rounded-xl transition-all group cursor-pointer text-neutral-400 hover:text-accent">
+                        <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                        <span class="text-[10px] font-mono">Lock</span>
+                    </div>
+                    <div
+                        class="aspect-square flex flex-col items-center justify-center border border-white/5 hover:border-accent/40 hover:bg-accent/5 rounded-xl transition-all group cursor-pointer text-neutral-400 hover:text-accent">
+                        <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M5 12h14M12 5l7 7-7 7"></path>
+                        </svg>
+                        <span class="text-[10px] font-mono">ArrowR</span>
+                    </div>
+                    <div
+                        class="aspect-square flex flex-col items-center justify-center border border-white/5 hover:border-accent/40 hover:bg-accent/5 rounded-xl transition-all group cursor-pointer text-neutral-400 hover:text-accent">
+                        <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                            </path>
+                        </svg>
+                        <span class="text-[10px] font-mono">Database</span>
+                    </div>
+                    <!-- Icon item -->
+                    <div
+                        class="aspect-square flex flex-col items-center justify-center border border-white/5 hover:border-accent/40 hover:bg-accent/5 rounded-xl transition-all group cursor-pointer text-neutral-400 hover:text-accent">
+                        <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            </path>
+                        </svg>
+                        <span class="text-[10px] font-mono">Grid</span>
+                    </div>
+                    <div
+                        class="aspect-square flex flex-col items-center justify-center border border-white/5 hover:border-accent/40 hover:bg-accent/5 rounded-xl transition-all group cursor-pointer text-neutral-400 hover:text-accent">
+                        <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                        <span class="text-[10px] font-mono">Terminal</span>
+                    </div>
+                    <div
+                        class="aspect-square flex flex-col items-center justify-center border border-white/5 hover:border-accent/40 hover:bg-accent/5 rounded-xl transition-all group cursor-pointer text-neutral-400 hover:text-accent">
+                        <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9">
+                            </path>
+                        </svg>
+                        <span class="text-[10px] font-mono">Globe</span>
+                    </div>
+                    <div
+                        class="aspect-square flex flex-col items-center justify-center border border-white/5 hover:border-accent/40 hover:bg-accent/5 rounded-xl transition-all group cursor-pointer text-neutral-400 hover:text-accent">
+                        <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
+                            </path>
+                        </svg>
+                        <span class="text-[10px] font-mono">Sliders</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==============================================
+             ANIMATIONS
+        =============================================== -->
+        <section id="animations" class="relative">
+            <div class="mb-16 reveal">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] mb-4 text-emerald-400">Interaction</p>
+                <h2 class="text-4xl font-semibold tracking-tight text-white mb-4">Motion & Effects</h2>
+                <p class="text-neutral-400 max-w-xl font-light">Reusable SVG stroke beams, pulsating dots, and
+                    continuous loaders defining the system's "alive" state.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 reveal">
+
+                <!-- Beam Demo -->
+                <div class="component-box p-8 flex flex-col items-center justify-center h-64 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-grid opacity-20"></div>
+                    <svg class="absolute w-[200%] h-full" preserveAspectRatio="none" viewBox="0 0 1000 100">
+                        <path id="beam-path" d="M0,50 Q250,100 500,50 T1000,50" fill="none"
+                            stroke="rgba(255,255,255,0.05)" stroke-width="2" />
+                        <path d="M0,50 Q250,100 500,50 T1000,50" fill="none" stroke="#10b981" stroke-width="2"
+                            stroke-dasharray="20 400" stroke-linecap="round" class="animate-beam" />
+                    </svg>
+                    <div class="mt-auto text-xs font-mono text-neutral-400 z-10 bg-black/50 px-3 py-1 rounded">Vector
+                        Beam</div>
+                </div>
+
+                <!-- Sonar Pulse Demo -->
+                <div class="component-box p-8 flex flex-col items-center justify-center h-64">
+                    <div class="relative w-16 h-16 flex items-center justify-center mb-8">
+                        <div class="absolute inset-0 border border-accent rounded-full animate-ping opacity-75"></div>
+                        <div
+                            class="absolute inset-[-20px] border border-accent/30 rounded-full animate-[ping_2s_infinite]">
+                        </div>
+                        <div class="w-4 h-4 rounded-full bg-accent shadow-[0_0_20px_#10b981]"></div>
+                    </div>
+                    <div class="text-xs font-mono text-neutral-400">Sonar Pulse</div>
+                </div>
+
+                <!-- Spinning Loader -->
+                <div class="component-box p-8 flex flex-col items-center justify-center h-64">
+                    <div class="relative w-20 h-20 mb-8">
+                        <div
+                            class="absolute inset-0 border border-dashed border-white/20 rounded-full animate-spin-slow">
+                        </div>
+                        <div
+                            class="absolute inset-2 border-t-2 border-accent rounded-full animate-[spin_1.5s_linear_infinite]">
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                        </div>
+                    </div>
+                    <div class="text-xs font-mono text-neutral-400">Orbital Spinner</div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-white/[0.04] bg-[#020202] py-20 px-6 mt-40">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex items-center gap-3">
+                <div class="w-6 h-6 bg-accent rounded-md flex items-center justify-center">
+                    <div class="w-2 h-2 bg-white rounded-full"></div>
+                </div>
+                <span class="font-semibold text-white">Aether Design System</span>
+            </div>
+            <p class="text-neutral-500 font-mono text-xs uppercase tracking-widest">Global Protocol V3.0 — Offline
+                Capable</p>
+        </div>
+    </footer>
+
+    <!-- Initialize Scripts -->
+    <script>
+        // Fake Loading Screen
+        window.addEventListener('load', () => {
+            let progress = 0;
+            const loaderFill = document.getElementById("loader-fill");
+            const loaderText = document.getElementById("loader-text");
+            const loaderScreen = document.getElementById("loading-screen");
+            const intv = setInterval(() => {
+                progress += Math.random() * 8;
+                if (progress > 100) progress = 100;
+                loaderFill.style.width = progress + "%";
+                loaderText.innerText = Math.floor(progress) + "%";
+                if (progress === 100) {
+                    clearInterval(intv);
+                    gsap.to(loaderScreen, { opacity: 0, duration: 1, onComplete: () => loaderScreen.remove() });
+                    init3D();
+                }
+            }, 50);
+        });
+
+        // Theme Toggle (Simplified since forced Dark for this demo)
+        const themeToggle = document.getElementById("theme-toggle");
+        themeToggle.addEventListener("click", () => {
+            document.documentElement.classList.toggle("dark");
+        });
+
+        // GSAP Scroll Reveal
+        gsap.registerPlugin(ScrollTrigger);
+        document.querySelectorAll('.reveal').forEach((el) => {
+            gsap.to(el, {
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 85%",
+                },
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                ease: "power2.out"
+            });
+            // remove active class logic since GSAP handles it
+            el.classList.remove('reveal');
+            el.style.opacity = 0;
+            el.style.transform = "translateY(30px)";
+        });
+
+        // ThreeJS Background Animation
+        function init3D() {
+            const container = document.getElementById('ds-canvas-container');
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x020202, 0.002);
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+            gsap.to(container, { opacity: 0.15, duration: 2 }); // fade in
+
+            // Particles
+            const pGeo = new THREE.BufferGeometry();
+            const pCount = 2000;
+            const pos = new Float32Array(pCount * 3);
+            for (let i = 0; i < pCount * 3; i++) {
+                pos[i] = (Math.random() - 0.5) * 40;
+            }
+            pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const pMat = new THREE.PointsMaterial({
+                color: 0x10b981,
+                size: 0.03,
+                transparent: true,
+                opacity: 0.5
+            });
+            const particles = new THREE.Points(pGeo, pMat);
+            scene.add(particles);
+
+            camera.position.z = 10;
+
+            // Add subtle mouse movement
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+                mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                particles.rotation.y += 0.001;
+                particles.rotation.x += 0.0005;
+
+                // Parallax
+                camera.position.x += (mouseX * 2 - camera.position.x) * 0.05;
+                camera.position.y += (-mouseY * 2 - camera.position.y) * 0.05;
+                camera.lookAt(scene.position);
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+    </script>
+</body>
+
+</html>

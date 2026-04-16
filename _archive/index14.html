@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth dark">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gomes Advocacia | Direito Previdenciário Premium</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Added Playfair Display for a more sophisticated, premium font for the logo -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap"
+        rel="stylesheet" />
+
+    <!-- GSAP for animations & scroll control -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+    <!-- ScrollyVideo for cinematic video -->
+    <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
+
+    <!-- Lenis for smooth scroll -->
+    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis/bundled/lenis.min.js"></script>
+
+    <!-- Tailwind Config based on Design System -->
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"]
+                    },
+                    colors: {
+                        bgDark: "#020202",
+                        surfaceDark: "#0a0a0a",
+                        borderDark: "rgba(255, 255, 255, 0.06)",
+                        textDark: "#EAEAEA",
+                        accent: "#10B981",
+                        accentGlow: "#34D399",
+                    },
+                    animation: {
+                        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                    }
+                },
+            },
+        };
+    </script>
+
+    <style>
+        body {
+            background-color: #020202;
+            color: #eaeaea;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* === Elegant Custom Scrollbar === */
+        ::-webkit-scrollbar {
+            width: 6px;
+            /* Mais fino e discreto */
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #020202;
+            /* Combina com o fundo do site */
+            border-left: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            /* Cinza translúcido sofisticado */
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(16, 185, 129, 0.4);
+            /* Brilho verde sutil ao passar o mouse */
+        }
+
+        /* Lenis setup */
+        html.lenis,
+        html.lenis body {
+            height: auto;
+        }
+
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
+        }
+
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* Text Utilities */
+        .text-gradient-green {
+            background: linear-gradient(135deg, #6ee7b7, #10b981, #059669);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .text-hollow {
+            background-color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
+            color: transparent;
+        }
+
+        .bg-grid {
+            background-size: 80px 80px;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        }
+
+        /* Advanced Luxury Buttons */
+        .btn-luxury {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, rgba(25, 25, 25, 0.8), rgba(5, 5, 5, 1));
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 15px rgba(212, 175, 55, 0.05);
+            color: #EAEAEA;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border-radius: 9999px;
+        }
+
+        .btn-luxury::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.25), transparent);
+            transform: translateX(-150%) skewX(-25deg);
+            transition: transform 0.7s ease;
+        }
+
+        .btn-luxury:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 30px rgba(212, 175, 55, 0.4);
+            transform: translateY(-4px) scale(1.02);
+            border-color: rgba(212, 175, 55, 0.7);
+            color: #D4AF37;
+        }
+
+        .btn-luxury:hover::after {
+            transform: translateX(150%) skewX(-25deg);
+        }
+
+        .btn-secondary {
+            position: relative;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.4s;
+            backdrop-filter: blur(8px);
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border-radius: 9999px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Fale Conosco - Beam Button (Polished) */
+        @keyframes spin-beam {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .btn-beam {
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+            border-radius: 9999px;
+            padding: 2px;
+            transition: transform 0.3s;
+        }
+
+        .btn-beam::before {
+            content: "";
+            position: absolute;
+            inset: -4px;
+            /* Extends past edges to allow rotation coverage */
+            z-index: -1;
+            background: conic-gradient(from 90deg at 50% 50%, rgba(212, 175, 55, 0.6) 0%, #020202 30%, #D4AF37 50%, #020202 70%, rgba(212, 175, 55, 0.6) 100%);
+            animation: spin-beam 3s linear infinite;
+            border-radius: inherit;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-beam:hover::before {
+            opacity: 1;
+        }
+
+        .btn-beam:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-beam-content {
+            background-color: #050505;
+            color: #eaeaea;
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 24px;
+            font-size: 0.875rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn-beam:hover .btn-beam-content {
+            background-color: rgba(5, 5, 5, 0.9);
+            color: #fff;
+        }
+
+        /* Annotations & Entrances */
+        .gsap-fade-up {
+            opacity: 0;
+            transform: translate3d(0, 40px, 0);
+            will-change: transform, opacity;
+        }
+
+        .gsap-fade {
+            opacity: 0;
+            will-change: opacity, transform;
+        }
+
+        .text-reveal-wrapper {
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: bottom;
+        }
+
+        .text-reveal-content {
+            transform: translateY(110%);
+            opacity: 0;
+            display: block;
+        }
+
+        /* === CINEMATIC HERO LAYOUT === */
+        .hero-scroll-container {
+            height: 400vh;
+            position: relative;
+        }
+
+        .hero-layout {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100dvh;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        /* Left Side (Text content) */
+        .left-col {
+            position: absolute;
+            inset: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .left-col>* {
+            pointer-events: auto;
+        }
+
+        @media (min-width: 1024px) {
+            .left-col {
+                padding: 4rem 4rem 4rem 8vw;
+                width: 70%;
+            }
+        }
+
+        /* Right Side (Video) */
+        .right-col {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: 10;
+            background-color: #020202;
+        }
+
+        .video-container {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            will-change: transform;
+            transform-origin: center center;
+            overflow: hidden;
+            background-color: transparent;
+        }
+
+        #parallax-video {
+            width: 100%;
+            height: 100%;
+            transform: translate3d(0, 0, 0);
+            will-change: transform;
+        }
+
+        /* Floating Cards Polished */
+        .modern-card {
+            background: linear-gradient(145deg, rgba(20, 20, 20, 0.6), rgba(8, 8, 8, 0.9));
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modern-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.7s ease;
+        }
+
+        .modern-card:hover::before {
+            left: 150%;
+        }
+
+        .modern-card:hover {
+            border-color: rgba(16, 185, 129, 0.5);
+            transform: translateY(-8px) scale(1.02) !important;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.7), 0 0 30px rgba(16, 185, 129, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .card-icon-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10B981;
+            box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.1);
+        }
+
+        .anim-float {
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .anim-float-delayed {
+            animation: float 9s ease-in-out infinite;
+            animation-delay: -3s;
+        }
+
+        .anim-float-slow {
+            animation: float 10s ease-in-out infinite;
+            animation-delay: -6s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        /* Interactive Element Highlight */
+        .glowing-dot {
+            position: relative;
+        }
+
+        .glowing-dot::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.4);
+            filter: blur(4px);
+            z-index: -1;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+        }
+
+        /* === NEW AETHER INSPIRED STYLES === */
+
+        .karaoke-word {
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+
+        /* Bento cards */
+        .bento-card {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.6) 0%, rgba(8, 8, 8, 0.9) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bento-card:hover {
+            border-color: rgba(16, 185, 129, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(16, 185, 129, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .bento-spot {
+            position: absolute;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 0;
+            transform: translate(-50%, -50%);
+        }
+
+        .bento-card:hover .bento-spot {
+            opacity: 1;
+        }
+
+        .bento-card>* {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Timeline Styles */
+        .timeline-point {
+            box-shadow: 0 0 0 4px #020202, 0 0 0 5px rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .timeline-step-active .timeline-point {
+            background-color: #10B981;
+            border-color: transparent;
+            box-shadow: 0 0 0 4px #020202, 0 0 0 5px rgba(16, 185, 129, 0.3), 0 0 30px rgba(16, 185, 129, 0.6);
+            transform: scale(1.2);
+        }
+
+        .timeline-step-active .timeline-card-visual {
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 10px 40px -10px rgba(16, 185, 129, 0.15);
+        }
+
+        .timeline-step-active .timeline-text-shard {
+            color: #10B981;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+        }
+
+        @keyframes scan-line {
+            0% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(400%);
+                opacity: 0;
+            }
+        }
+
+        .timeline-scan-beam {
+            background: linear-gradient(180deg, transparent, rgba(16, 185, 129, 0.2), transparent);
+            animation: scan-line 3s linear infinite;
+        }
+
+        .dark-section-bg {
+            background-color: #020202;
+            position: relative;
+            z-index: 20;
+        }
+    </style>
+</head>
+
+<body class="selection:bg-accent/30 selection:text-accent font-sans relative">
+
+    <!-- Header Navigation -->
+    <header
+        class="fixed top-0 w-full z-50 bg-[#020202]/40 backdrop-blur-xl border-b border-white/[0.04] transition-colors duration-500">
+        <div class="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#10B981] to-[#059669] flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)] relative group cursor-pointer overflow-hidden">
+                    <div
+                        class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    </div>
+                    <svg class="w-5 h-5 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3">
+                        </path>
+                    </svg>
+                </div>
+
+                <!-- Nome Melhorado e Sofisticado usando Playfair Display -->
+                <span
+                    class="text-white text-xl lg:text-2xl drop-shadow-md flex items-baseline gap-[6px] translate-y-[1px]"
+                    style="font-family: 'Playfair Display', serif;">
+                    <span class="font-semibold tracking-[0.03em]">Gomes</span>
+                    <span
+                        class="font-normal italic tracking-widest text-neutral-300 text-lg lg:text-[22px]">Advocacia</span>
+                </span>
+
+            </div>
+
+            <nav
+                class="hidden md:flex items-center gap-10 text-xs font-mono uppercase tracking-widest text-neutral-400">
+                <a href="#nossos-diferenciais"
+                    class="hover:text-white transition-colors duration-300 hover:-translate-y-0.5 transform inline-block">Nossos
+                    Diferenciais</a>
+                <a href="#fluxo-processual"
+                    class="hover:text-white transition-colors duration-300 hover:-translate-y-0.5 transform inline-block">Fluxo
+                    Processual</a>
+                <a href="#areas-de-atuacao"
+                    class="hover:text-white transition-colors duration-300 hover:-translate-y-0.5 transform inline-block">Áreas
+                    de Atuação</a>
+            </nav>
+
+            <div class="flex gap-4">
+                <button class="btn-beam">
+                    <div class="btn-beam-content">
+                        Fale Conosco
+                    </div>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Parallax Scroll Wrapper -->
+    <div class="hero-scroll-container" id="hero-scroll-wrapper">
+        <main class="hero-layout bg-transparent">
+
+            <!-- Right Side: Full Viewport Video Background -->
+            <div class="right-col">
+                <div class="video-container gsap-fade">
+                    <div id="parallax-video"></div>
+                </div>
+
+                <!-- Refined Overlays: Lighter when scrolling down to reveal the video clearly -->
+                <!-- Base dark overlay (will fade out slightly on scroll) -->
+                <div
+                    class="dark-overlay-base absolute inset-0 bg-black/30 pointer-events-none z-10 transition-opacity duration-700">
+                </div>
+
+                <!-- Left gradient for text readability (Will fade out on scroll so it Doesn't get too dark) -->
+                <div
+                    class="dark-overlay-left absolute inset-0 bg-gradient-to-r from-[#020202]/70 via-[#020202]/30 to-transparent pointer-events-none z-10 hidden lg:block">
+                </div>
+
+                <!-- Mobile gradient (also fades out on scroll) -->
+                <div
+                    class="dark-overlay-mobile absolute inset-0 bg-gradient-to-t from-[#020202]/90 via-[#020202]/50 to-transparent pointer-events-none z-10 lg:hidden">
+                </div>
+
+                <!-- Floating Cards positioned creatively around the right canvas area -->
+                <div class="absolute inset-0 w-full h-full pointer-events-none z-20 content-to-blur">
+
+                    <!-- Desktop floating cards -->
+                    <div class="hidden lg:block relative w-full h-full">
+
+                        <!-- Card 1: Top Right - Polished aesthetic -->
+                        <div
+                            class="modern-card absolute top-[20%] right-[10%] p-4 pr-6 rounded-2xl flex items-center gap-4 anim-float opacity-0 hero-card">
+                            <div class="card-icon-wrapper">
+                                <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-[9px] font-mono text-neutral-400 uppercase tracking-widest mb-0.5">Especialidade</span>
+                                <span class="text-sm font-semibold text-white tracking-wide">Aposentadoria</span>
+                            </div>
+                            <div class="w-1.5 h-1.5 rounded-full bg-accent ml-2 glowing-dot"></div>
+                        </div>
+
+                        <!-- Card 2: Middle Right - Floating out further -->
+                        <div
+                            class="modern-card absolute top-[45%] right-[5%] p-4 pr-6 rounded-2xl flex items-center gap-4 anim-float-delayed opacity-0 hero-card">
+                            <div class="card-icon-wrapper"
+                                style="background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(52, 211, 153, 0.05)); border-color: rgba(52, 211, 153, 0.3);">
+                                <svg class="w-5 h-5 text-[#34D399]" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-[9px] font-mono text-neutral-400 uppercase tracking-widest mb-0.5">Análise
+                                    Premium</span>
+                                <span class="text-sm font-semibold text-white tracking-wide">Revisão de Benefício</span>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Bottom Right Center -->
+                        <div
+                            class="modern-card absolute bottom-[25%] right-[15%] p-4 pr-6 rounded-2xl flex items-center gap-4 anim-float-slow opacity-0 hero-card">
+                            <div class="card-icon-wrapper"
+                                style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)); border-color: rgba(255, 255, 255, 0.2);">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="text-[9px] font-mono text-neutral-400 uppercase tracking-widest mb-0.5">Estratégia
+                                    Jurídica</span>
+                                <span class="text-sm font-semibold text-white tracking-wide">Plan. Previdenciário</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Left Side: Content Overlay -->
+            <div class="left-col z-20">
+                <!-- Grid Background Overlay just for the left area adding technical precision aspect -->
+                <div
+                    class="absolute inset-0 pointer-events-none bg-grid opacity-[0.03] hidden lg:block mask-image-[linear-gradient(to_right,white,transparent)]">
+                </div>
+
+                <div
+                    class="max-w-2xl w-full pt-20 lg:pt-0 relative z-30 content-to-blur text-center lg:text-left mx-auto lg:mx-0">
+
+                    <!-- Small Label -->
+                    <div
+                        class="gsap-fade-up inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-black/40 backdrop-blur-md mb-8 shadow-xl">
+                        <span
+                            class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-slow shadow-[0_0_8px_rgba(16,185,129,0.8)] glowing-dot"></span>
+                        <span
+                            class="text-[10px] font-mono font-medium text-white/90 uppercase tracking-[0.25em]">Advocacia
+                            Previdenciária</span>
+                    </div>
+
+                    <!-- Headline (Text reveal animation) -->
+                    <h1
+                        class="text-[3rem] md:text-5xl lg:text-[5.5rem] font-bold tracking-tighter mb-6 leading-[1.05] text-white flex flex-col items-center lg:items-start text-balance">
+                        <span class="text-reveal-wrapper block mb-1">
+                            <span class="text-reveal-content headline-line text-hollow drop-shadow-lg">Garanta
+                                seus</span>
+                        </span>
+                        <span class="text-reveal-wrapper block pb-1">
+                            <span class="text-reveal-content headline-line text-white drop-shadow-2xl">Direitos
+                                Previdenciários</span>
+                        </span>
+                        <span class="text-reveal-wrapper mt-2 block pb-2">
+                            <span class="text-reveal-content headline-line text-white drop-shadow-2xl">com
+                                Segurança.</span>
+                        </span>
+                    </h1>
+
+                    <!-- Subtitle -->
+                    <p
+                        class="gsap-fade-up text-lg md:text-xl text-neutral-300 font-light leading-relaxed mb-10 drop-shadow-lg max-w-xl mx-auto lg:mx-0 text-balance">
+                        A Gomes Advocacia é altamente especializada, ajudando você a conquistar aposentadorias, revisões
+                        decisivas e estabilidade jurídica a longo prazo.
+                    </p>
+
+                    <!-- Buttons -->
+                    <div
+                        class="gsap-fade-up flex flex-col sm:flex-row gap-5 w-full sm:w-auto justify-center lg:justify-start">
+                        <button
+                            class="btn-luxury group h-14 px-8 md:px-10 flex items-center justify-center gap-3 text-[14px]">
+                            Solicitar Atendimento
+                            <iconify-icon icon="solar:arrow-right-linear"
+                                class="text-lg transition-transform duration-300 group-hover:translate-x-1.5"></iconify-icon>
+                        </button>
+                        <button
+                            class="btn-secondary h-14 px-8 md:px-10 flex items-center justify-center gap-3 text-[13px]">
+                            Ver Áreas de Atuação
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+
+    <!-- =========================================================
+         NEW AETHER INSPIRED SECTIONS
+    ========================================================= -->
+    <div class="dark-section-bg">
+        <!-- Text Section (Karaoke) -->
+        <section class="py-40 px-6">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl md:text-[3.5rem] font-semibold leading-[1.3] text-left text-white tracking-tight"
+                    id="karaoke-text">
+                    <span class="karaoke-word opacity-20">A</span>
+                    <span class="karaoke-word opacity-20">nossa</span>
+                    <span class="karaoke-word opacity-20">missão</span>
+                    <span class="karaoke-word opacity-20">é</span>
+                    <span class="karaoke-word opacity-20">lutar</span>
+                    <span class="karaoke-word opacity-20">pela</span>
+                    <span class="karaoke-word opacity-20">sua</span>
+                    <span class="karaoke-word opacity-20">dignidade.</span>
+                    <span class="karaoke-word opacity-20">Enxergamos</span>
+                    <span class="karaoke-word opacity-20">a</span>
+                    <span class="karaoke-word opacity-20">sua</span>
+                    <span class="karaoke-word opacity-20">história</span>
+                    <span class="karaoke-word opacity-20">de</span>
+                    <span class="karaoke-word opacity-20">vida</span>
+                    <span class="karaoke-word opacity-20">e</span>
+                    <span class="karaoke-word opacity-20">não</span>
+                    <span class="karaoke-word opacity-20">abrimos</span>
+                    <span class="karaoke-word opacity-20">mão</span>
+                    <span class="karaoke-word opacity-20">da</span>
+                    <span class="karaoke-word opacity-20">justiça</span>
+                    <span class="karaoke-word opacity-20">verdadeira.</span>
+                </h2>
+            </div>
+        </section>
+
+        <!-- Glass Bento Capabilities -->
+        <section class="py-32 px-6" id="nossos-diferenciais">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-14 gsap-fade-up">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#10B981] mb-4">
+                        Nossos Diferenciais
+                    </p>
+                    <h2 class="text-3xl md:text-5xl font-semibold tracking-tight text-white mb-4">
+                        Uma advocacia de excelência e humanidade
+                    </h2>
+                    <p class="text-neutral-400 max-w-xl mx-auto font-light">
+                        Ao nos contratar, você conta com um escritório altamente capacitado que blindará os seus
+                        direitos perante a rigidez do INSS.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+                    <!-- Card 1 -->
+                    <article
+                        class="bento-card md:col-span-7 p-7 rounded-[22px] backdrop-blur-xl relative overflow-hidden gsap-fade-up flex flex-col justify-between">
+                        <div>
+                            <div class="bento-spot"></div>
+                            <h3 class="text-white font-semibold text-xl mb-2">Atendimento Altamente Humanizado</h3>
+                            <p class="text-neutral-400 text-sm max-w-md font-light">
+                                Sabemos que atrás de cada requerimento existe a vida e a dignidade de uma pessoa ou de
+                                uma família inteira. Valorizamos a sua história.
+                            </p>
+                            <div class="mt-6 flex items-center gap-3 text-xs text-white/70">
+                                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5">Empatia</span>
+                                <span
+                                    class="px-3 py-1 rounded-full border border-white/10 bg-white/5">Acolhimento</span>
+                                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5">Dedicação</span>
+                            </div>
+                        </div>
+                        <div
+                            class="mt-8 w-full h-[280px] md:h-[320px] rounded-[16px] bg-black/40 border border-white/[0.05] flex items-center justify-center p-4 relative z-10 shadow-[inset_0_0_30px_rgba(0,0,0,0.6)]">
+                            <!-- Refined Image Stage to perfectly accommodate uncropped photo -->
+                            <img alt="Atendimento Humanizado"
+                                class="w-full h-full object-contain opacity-95 drop-shadow-[0_15px_25px_rgba(0,0,0,0.8)]"
+                                src="assets/raw_files/foto1.jpeg" />
+                        </div>
+                    </article>
+
+                    <!-- Card 2 -->
+                    <article
+                        class="bento-card md:col-span-5 p-7 rounded-[22px] backdrop-blur-xl relative overflow-hidden gsap-fade-up flex flex-col justify-between">
+                        <div>
+                            <div class="bento-spot"></div>
+                            <h3 class="text-white font-semibold text-xl mb-2">Dra. Clarice</h3>
+                            <p class="text-neutral-400 text-sm font-light">
+                                Especialista máxima. Uma advocacia combativa, detalhista, que não aceita "Nãos" vazios
+                                do sistema sem uma robusta base legal em favor da sua vivência.
+                            </p>
+                        </div>
+                        <div
+                            class="mt-8 w-full h-[280px] md:h-[320px] rounded-[16px] bg-black/40 border border-white/[0.05] flex items-center justify-center p-4 relative z-10 shadow-[inset_0_0_30px_rgba(0,0,0,0.6)]">
+                            <img alt="Dra Clarice Gomes Neto"
+                                class="w-full h-full object-contain opacity-95 drop-shadow-[0_15px_25px_rgba(0,0,0,0.8)]"
+                                src="assets/raw_files/foto2.jpeg" />
+                        </div>
+                    </article>
+
+                    <!-- Card 3 -->
+                    <article
+                        class="bento-card md:col-span-5 p-7 rounded-[22px] backdrop-blur-xl relative overflow-hidden gsap-fade-up flex flex-col justify-between">
+                        <div>
+                            <div class="bento-spot"></div>
+                            <h3 class="text-white font-semibold text-xl mb-2">Foco Previdenciário</h3>
+                            <p class="text-neutral-400 text-sm font-light">
+                                A concentração na Previdência nos confere domínio irrestrito das teses mais novas dos
+                                tribunais, buscando aposentadorias robustas.
+                            </p>
+                            <div class="mt-8 grid grid-cols-2 gap-4">
+                                <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+                                    <p class="text-[#10B981] text-sm font-semibold">Decisões</p>
+                                    <p class="text-white/50 text-xs mt-1">Impactos imediatos</p>
+                                </div>
+                                <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+                                    <p class="text-[#10B981] text-sm font-semibold">Teses</p>
+                                    <p class="text-white/50 text-xs mt-1">Sempre atualizadas</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mt-8 w-full h-[280px] md:h-[320px] rounded-[16px] bg-black/40 border border-white/[0.05] flex items-center justify-center p-4 relative z-10 shadow-[inset_0_0_30px_rgba(0,0,0,0.6)]">
+                            <img alt="Foco Previdenciário"
+                                class="w-full h-full object-contain opacity-95 drop-shadow-[0_15px_25px_rgba(0,0,0,0.8)]"
+                                src="assets/raw_files/foto3.jpeg" />
+                        </div>
+                    </article>
+
+                    <!-- Card 4 -->
+                    <article
+                        class="bento-card md:col-span-7 p-7 rounded-[22px] backdrop-blur-xl relative overflow-hidden gsap-fade-up flex flex-col justify-between">
+                        <div>
+                            <div class="bento-spot"></div>
+                            <h3 class="text-white font-semibold text-xl mb-2">Honestidade & Transparência</h3>
+                            <p class="text-neutral-400 text-sm max-w-md font-light">
+                                Mantemos você no controle. Informações cristalinas, repasses de andamento constantes e
+                                comunicação sempre disposta sem barreiras corporativas. Não criamos falsas ilusões.
+                            </p>
+                            <div class="mt-7 flex flex-wrap gap-3 text-xs text-white/70">
+                                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5">Clareza no
+                                    Processo</span>
+                                <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5">Comunicação
+                                    Humana</span>
+                            </div>
+                        </div>
+                        <div
+                            class="mt-8 w-full h-[280px] md:h-[320px] rounded-[16px] bg-black/40 border border-white/[0.05] flex items-center justify-center p-4 relative z-10 shadow-[inset_0_0_30px_rgba(0,0,0,0.6)]">
+                            <img alt="Honestidade e Transparência"
+                                class="w-full h-full object-contain opacity-95 drop-shadow-[0_15px_25px_rgba(0,0,0,0.8)]"
+                                src="assets/raw_files/foto4.jpeg" />
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Timeline Section -->
+        <section class="py-40 px-6 relative overflow-hidden" id="fluxo-processual">
+            <!-- Ambient Background -->
+            <div class="absolute inset-0 pointer-events-none"
+                style="background-image: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 1px, transparent 1px); background-size: 40px 40px; mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);">
+            </div>
+
+            <div class="max-w-6xl mx-auto relative z-10">
+                <!-- Section Header -->
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-24 gsap-fade-up">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="h-px w-8 bg-[#10B981]"></div>
+                            <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#10B981]/90">
+                                Fluxo Processual
+                            </p>
+                        </div>
+                        <h2 class="text-3xl md:text-5xl font-semibold tracking-tight text-white leading-tight">
+                            Arquitetura de
+                            <br />
+                            <span class="text-white/30">
+                                Resultados Reais
+                            </span>
+                        </h2>
+                    </div>
+                    <p
+                        class="text-neutral-400 max-w-sm text-sm leading-relaxed border-l border-white/10 pl-6 font-light">
+                        Entenda o protocolo dinâmico de nossa equipe técnica para sintetizar soluções ágeis na concessão
+                        de benefícios previdenciários.
+                    </p>
+                </div>
+
+                <!-- Timeline Track -->
+                <div class="relative pl-6 md:pl-0" id="timeline-track">
+                    <!-- Central Guide Lines -->
+                    <div class="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-white/5 md:-translate-x-px"></div>
+
+                    <!-- Active Filling Line -->
+                    <div class="absolute left-6 md:left-1/2 top-0 w-px bg-[#10B981] shadow-[0_0_15px_rgba(16,185,129,0.5)] md:-translate-x-px h-0 origin-top z-10"
+                        id="timeline-fill">
+                        <!-- Scanner Head -->
+                        <div
+                            class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-[0_0_20px_2px_rgba(16,185,129,0.9)] z-20">
+                        </div>
+                        <div
+                            class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-12 h-12 border border-[#10B981]/30 rounded-full animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite] opacity-50">
+                        </div>
+                    </div>
+
+                    <!-- Steps Container -->
+                    <div class="space-y-32 py-12">
+                        <!-- STEP 1 -->
+                        <div
+                            class="timeline-step relative grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24 opacity-20 blur-[4px] scale-[0.98] transition-all duration-700 ease-out will-change-transform">
+                            <!-- Left: Content -->
+                            <div class="md:text-right md:pr-12 relative order-2 md:order-1">
+                                <div class="inline-block relative">
+                                    <h3 class="text-2xl font-semibold text-white mb-2 tracking-tight">
+                                        Análise Tributária & Documental
+                                    </h3>
+                                    <p
+                                        class="timeline-text-shard text-[#10B981]/60 text-[10px] font-mono mb-4 uppercase tracking-widest transition-colors duration-500">
+                                        EXTRACTION_CNIS // FASE 01
+                                    </p>
+                                    <p class="text-neutral-400 text-sm leading-relaxed max-w-sm ml-auto font-light">
+                                        Aferição automatizada de vínculos e contribuições. Descartamos inconsistências
+                                        ainda na raiz, preparando o alicerce irrefutável do processo.
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- Center Anchor -->
+                            <div
+                                class="absolute left-6 md:left-1/2 top-0 w-3 h-3 -ml-1.5 rounded-full border border-white/20 bg-[#020202] z-20 timeline-point md:top-6">
+                            </div>
+                            <!-- Right: Visual -->
+                            <div class="pl-12 md:pl-0 order-3 md:order-2">
+                                <div
+                                    class="timeline-card-visual h-32 w-full md:w-72 bg-white/[0.02] rounded-xl border border-white/10 backdrop-blur-md relative overflow-hidden group transition-all duration-500">
+                                    <div class="timeline-scan-beam absolute inset-0 w-full h-[50%]"></div>
+                                    <div class="absolute inset-0 flex items-center justify-center gap-2">
+                                        <div
+                                            class="w-12 h-12 rounded-lg border border-white/10 flex items-center justify-center bg-black/20">
+                                            <div class="w-1 h-1 bg-white/40 rounded-full"></div>
+                                        </div>
+                                        <div
+                                            class="w-12 h-12 rounded-lg border border-[#10B981]/20 flex items-center justify-center bg-[#10B981]/5 shadow-[0_0_15px_-5px_rgba(16,185,129,0.3)]">
+                                            <div class="w-1.5 h-1.5 bg-[#10B981] rounded-full animate-pulse"></div>
+                                        </div>
+                                        <div
+                                            class="w-12 h-12 rounded-lg border border-white/10 flex items-center justify-center bg-black/20">
+                                            <div class="w-1 h-1 bg-white/40 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 2 -->
+                        <div
+                            class="timeline-step relative grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24 opacity-20 blur-[4px] scale-[0.98] transition-all duration-700 ease-out will-change-transform">
+                            <!-- Left: Visual -->
+                            <div class="md:text-right md:pr-0 relative order-3 md:order-1 flex md:justify-end">
+                                <div class="pl-12 md:pl-0 md:pr-12 w-full md:w-auto flex justify-end">
+                                    <div
+                                        class="timeline-card-visual h-32 w-full md:w-72 bg-white/[0.02] rounded-xl border border-white/10 backdrop-blur-md relative overflow-hidden flex items-center justify-center transition-all duration-500">
+                                        <div class="flex gap-[3px] items-end h-12">
+                                            <span
+                                                class="w-1 bg-[#10B981]/30 rounded-sm animate-[pulse_2s_ease-in-out_infinite]"
+                                                style="height: 40%"></span>
+                                            <span
+                                                class="w-1 bg-[#10B981]/60 rounded-sm animate-[pulse_2s_ease-in-out_infinite]"
+                                                style="height: 80%; animation-delay: 0.1s"></span>
+                                            <span
+                                                class="w-1 bg-[#10B981]/40 rounded-sm animate-[pulse_2s_ease-in-out_infinite]"
+                                                style="height: 60%; animation-delay: 0.2s"></span>
+                                            <span
+                                                class="w-1 bg-[#10B981]/80 rounded-sm animate-[pulse_2s_ease-in-out_infinite]"
+                                                style="height: 100%; animation-delay: 0.3s"></span>
+                                            <span
+                                                class="w-1 bg-[#10B981]/50 rounded-sm animate-[pulse_2s_ease-in-out_infinite]"
+                                                style="height: 50%; animation-delay: 0.4s"></span>
+                                        </div>
+                                        <div class="absolute top-3 right-3 text-[9px] font-mono text-white/20">
+                                            JURIS_CALC
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Center Anchor -->
+                            <div
+                                class="absolute left-6 md:left-1/2 top-0 w-3 h-3 -ml-1.5 rounded-full border border-white/20 bg-[#020202] z-20 timeline-point md:top-6">
+                            </div>
+                            <!-- Right: Content -->
+                            <div class="pl-12 md:pl-0 order-2 md:order-2">
+                                <div class="inline-block relative">
+                                    <h3 class="text-2xl font-semibold text-white mb-2 tracking-tight">
+                                        Arquitetura Jurídica
+                                    </h3>
+                                    <p
+                                        class="timeline-text-shard text-[#10B981]/60 text-[10px] font-mono mb-4 uppercase tracking-widest transition-colors duration-500">
+                                        PETITION_MOUNT // FASE 02
+                                    </p>
+                                    <p class="text-neutral-400 text-sm leading-relaxed max-w-sm font-light">
+                                        Defesa estratégica. Base jurisprudencial avançada aplicada em tempo real sobre
+                                        seu cenário contributivo. Garantimos a precisão antes do ajuizamento.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3 -->
+                        <div
+                            class="timeline-step relative grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24 opacity-20 blur-[4px] scale-[0.98] transition-all duration-700 ease-out will-change-transform">
+                            <!-- Left: Content -->
+                            <div class="md:text-right md:pr-12 relative order-2 md:order-1">
+                                <div class="inline-block relative">
+                                    <h3 class="text-2xl font-semibold text-white mb-2 tracking-tight">
+                                        Protocolo & Deferimento
+                                    </h3>
+                                    <p
+                                        class="timeline-text-shard text-[#10B981]/60 text-[10px] font-mono mb-4 uppercase tracking-widest transition-colors duration-500">
+                                        SUCCESS_SYNTHESIS // FASE 03
+                                    </p>
+                                    <p class="text-neutral-400 text-sm leading-relaxed max-w-sm ml-auto font-light">
+                                        Transmissão e sustentação inabalável nos tribunais. O percurso processual é
+                                        encapsulado em nosso dashboard para seu monitoramento contínuo até a vitória
+                                        final.
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- Center Anchor -->
+                            <div
+                                class="absolute left-6 md:left-1/2 top-0 w-3 h-3 -ml-1.5 rounded-full border border-white/20 bg-[#020202] z-20 timeline-point md:top-6">
+                            </div>
+                            <!-- Right: Visual -->
+                            <div class="pl-12 md:pl-0 order-3 md:order-2">
+                                <div
+                                    class="w-12 h-12 rounded-full border-2 border-[#10B981] flex items-center justify-center bg-[#10B981]/10 shadow-[0_0_30px_rgba(16,185,129,0.4)]">
+                                    <svg class="w-5 h-5 text-[#10B981]" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Expertises / Services Section -->
+        <section class="py-32 px-6 border-t border-white/5 relative overflow-hidden" id="areas-de-atuacao">
+            <!-- Decorative Elements -->
+            <div
+                class="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-[#10B981]/5 to-transparent pointer-events-none">
+            </div>
+            <div class="max-w-6xl mx-auto relative z-10">
+                <div class="flex flex-col md:flex-row gap-16 items-center">
+                    <div class="flex-1 gsap-fade-up">
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#10B981] mb-4">
+                            Áreas de Atuação
+                        </p>
+                        <h2 class="text-3xl md:text-5xl font-semibold tracking-tight text-white mb-6">
+                            Direito<br />Previdenciário<br /><span class="text-white/30">de Alta Performance</span>
+                        </h2>
+                        <p class="text-neutral-400 text-sm leading-relaxed mb-8 max-w-md font-light">
+                            Não atuamos como generalistas. Nossa equipe respira previdência todos os dias, aplicando
+                            tecnologia e teses jurídicas de ponta para reverter negativas do INSS e garantir o teto do
+                            seu benefício.
+                        </p>
+
+                        <div class="space-y-6">
+                            <div class="group flex items-start gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center group-hover:border-[#10B981]/50 group-hover:bg-[#10B981]/10 transition-colors">
+                                    <svg class="w-5 h-5 text-neutral-400 group-hover:text-[#10B981] transition-colors"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-semibold mb-1">Aposentadoria de Valor Máximo</h4>
+                                    <p class="text-neutral-500 text-xs font-light">Especial, por idade, por tempo de
+                                        contribuição ou regras de transição precisas.</p>
+                                </div>
+                            </div>
+
+                            <div class="group flex items-start gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center group-hover:border-[#10B981]/50 group-hover:bg-[#10B981]/10 transition-colors">
+                                    <svg class="w-5 h-5 text-neutral-400 group-hover:text-[#10B981] transition-colors"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-semibold mb-1">Revisões (Vida Toda & Outras)</h4>
+                                    <p class="text-neutral-500 text-xs font-light">Recalculamos seu passado contributivo
+                                        em busca de teses já aprovadas nos tribunais superiores.</p>
+                                </div>
+                            </div>
+
+                            <div class="group flex items-start gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center group-hover:border-[#10B981]/50 group-hover:bg-[#10B981]/10 transition-colors">
+                                    <svg class="w-5 h-5 text-neutral-400 group-hover:text-[#10B981] transition-colors"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-semibold mb-1">Auxílios e BPC/LOAS</h4>
+                                    <p class="text-neutral-500 text-xs font-light">Suporte assertivo em benefícios por
+                                        incapacidade e assistência social com amparo pericial privado.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-1 relative gsap-fade-up">
+                        <div
+                            class="rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_50px_rgba(16,185,129,0.15)] relative bg-[#020202]">
+                            <img src="assets/raw_files/foto6.jpeg" alt="Direito Previdenciário"
+                                class="w-full h-auto object-contain">
+                        </div>
+                        <!-- Floating Small Image -->
+                        <div
+                            class="absolute -bottom-10 -left-10 w-[45%] max-w-[200px] rounded-2xl overflow-hidden border border-[#10B981]/30 shadow-[0_0_40px_rgba(0,0,0,0.8)] hidden md:block anim-float bg-[#020202]">
+                            <img src="assets/raw_files/foto5.jpeg" alt="Leis Previdenciárias"
+                                class="w-full h-auto object-contain">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="py-20 border-y border-white/5 bg-white/[0.01]">
+            <div class="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="gsap-fade-up">
+                    <div class="text-3xl font-bold text-white mb-1">98.5%</div>
+                    <div class="text-xs font-medium uppercase tracking-wider text-neutral-500">Êxito Administrativo
+                    </div>
+                </div>
+                <div class="gsap-fade-up" style="transition-delay:100ms">
+                    <div class="text-3xl font-bold text-white mb-1">15k+</div>
+                    <div class="text-xs font-medium uppercase tracking-wider text-neutral-500">Benefícios Concedidos
+                    </div>
+                </div>
+                <div class="gsap-fade-up" style="transition-delay:200ms">
+                    <div class="text-3xl font-bold text-white mb-1">48h</div>
+                    <div class="text-xs font-medium uppercase tracking-wider text-neutral-500">Análise Inicial Média
+                    </div>
+                </div>
+                <div class="gsap-fade-up" style="transition-delay:300ms">
+                    <div class="text-3xl font-bold text-white mb-1">20+</div>
+                    <div class="text-xs font-medium uppercase tracking-wider text-neutral-500">Anos de Especialização
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section (Polished) -->
+        <section class="py-40 px-6 relative overflow-hidden bg-[#020202]">
+            <!-- Subtle Radial Highlights -->
+            <div
+                class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-full bg-[radial-gradient(ellipse_at_top,rgba(16,185,129,0.06),transparent_70%)] pointer-events-none">
+            </div>
+
+            <div class="max-w-4xl mx-auto text-center relative z-10 gsap-fade-up">
+                <h2 class="text-4xl sm:text-5xl md:text-[4rem] font-bold tracking-tight text-white mb-6">
+                    Aposente-se com <span class="text-white">Dignidade.</span>
+                </h2>
+                <p
+                    class="text-base md:text-lg text-[#888888] mb-12 max-w-2xl mx-auto font-light leading-relaxed tracking-wide text-balance">
+                    Não aceite a contagem padrão do INSS sem uma revisão especializada. Nós assumimos o seu caso e
+                    lutamos pelo reconhecimento integral dos seus direitos.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button
+                        class="btn-luxury group h-[52px] px-10 flex items-center justify-center gap-3 mx-auto text-[13px]">
+                        AGENDAR ANÁLISE GRATUITA
+                        <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-12 border-t border-white/5 bg-[#020202] relative z-20">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="flex flex-col items-center md:items-start">
+                        <span class="text-white text-xl drop-shadow-md flex items-baseline gap-[6px] mb-2"
+                            style="font-family: 'Playfair Display', serif;">
+                            <span class="font-semibold tracking-[0.03em]">Gomes</span>
+                            <span class="font-normal italic tracking-widest text-[#10B981]">Advocacia</span>
+                        </span>
+                        <p class="text-xs text-neutral-500 font-mono">OAB/SP 123.456 - Especialistas no RGPS.</p>
+                    </div>
+
+                    <div class="flex gap-6 text-sm text-neutral-400">
+                        <a href="#" class="hover:text-white transition-colors">Termos de Uso</a>
+                        <a href="#" class="hover:text-white transition-colors">Privacidade</a>
+                        <a href="#" class="hover:text-white transition-colors">Contato</a>
+                    </div>
+
+                    <div class="text-xs text-neutral-600 font-mono">
+                        © 2026 Gomes Advocacia. All rights reserved.
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. Initialize Lenis Smooth Scroll
+            const lenis = new Lenis({
+                duration: 1.5,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                direction: 'vertical',
+                gestureDirection: 'vertical',
+                smooth: true,
+                mouseMultiplier: 1,
+                touchMultiplier: 2,
+            });
+
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
+            requestAnimationFrame(raf);
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+            gsap.ticker.lagSmoothing(0);
+
+            // 2. Trigger Entrance Animations
+            const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+            tl.fromTo(".gsap-fade", { opacity: 0, scale: 1.05 }, { opacity: 1, scale: 1, duration: 2.5, ease: "power2.out" }, 0.2);
+            tl.to(".headline-line", { opacity: 1, y: "0%", duration: 1.2, stagger: 0.2, ease: "power3.out" }, 0.4);
+            tl.fromTo(".gsap-fade-up", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.5, stagger: 0.15, ease: "power3.out" }, 0.8);
+
+            // Floating cards stagger entrance
+            setTimeout(() => {
+                gsap.to('.hero-card', {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1.5,
+                    stagger: 0.25,
+                    ease: "power4.out",
+                    startAt: { y: 40 }
+                });
+            }, 1000);
+
+            // 3. Cinematic ScrollyVideo Configuration
+            const scrollyVideoContainer = document.getElementById("parallax-video");
+
+            if (scrollyVideoContainer) {
+                const scrollyVideo = new ScrollyVideo({
+                    scrollyVideoContainer: scrollyVideoContainer,
+                    src: 'assets/raw_files/video.mp4',
+                    trackScroll: false,
+                    transitionSpeed: 0
+                });
+
+                const initScrubbing = () => {
+                    // Timeline linked to scroll progress via Scrub
+                    const scrollTl = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: ".hero-scroll-container",
+                            start: "top top",
+                            end: "bottom bottom",
+                            scrub: 1.2, // Cinematic smoothing
+                            onUpdate: (self) => {
+                                // Limita o progresso a 99.9% para evitar congelamento do vídeo
+                                let progress = self.progress;
+                                if (progress >= 1) progress = 0.999;
+                                if (scrollyVideo) scrollyVideo.setTargetTimePercent(progress);
+                            }
+                        }
+                    });
+
+                    // Slightly scale video WITHOUT Y-axis translation to prevent elements from getting cut
+                    scrollTl.fromTo(".video-container",
+                        { scale: 1 },
+                        { scale: 1.04, ease: "none" }, 0
+                    );
+
+                    // Fade out dark overlays slightly to make the video shine through clearer when scrolling
+                    scrollTl.to(".dark-overlay-left, .dark-overlay-mobile",
+                        { opacity: 0, ease: "sine.inOut", duration: 0.3 }, 0
+                    );
+
+                    // Fade text out using a secondary timeline linked uniquely to the first 25% of scroll
+                    gsap.to(".content-to-blur", {
+                        y: -80,
+                        opacity: 0,
+                        filter: "blur(20px)",
+                        scrollTrigger: {
+                            trigger: ".hero-scroll-container",
+                            start: "top top",
+                            end: "25% top",
+                            scrub: 1,
+                        }
+                    });
+                };
+
+                initScrubbing();
+            }
+
+            // 4. Karaoke Effect
+            const karaokeWords = document.querySelectorAll('.karaoke-word');
+            if (karaokeWords.length > 0) {
+                gsap.to(karaokeWords, {
+                    opacity: 1,
+                    stagger: 0.1,
+                    scrollTrigger: {
+                        trigger: '#karaoke-text',
+                        start: 'top 80%',
+                        end: 'bottom 40%',
+                        scrub: 1
+                    }
+                });
+            }
+
+            // 5. Bento Spot Hover Effect
+            const bentoCards = document.querySelectorAll('.bento-card');
+            bentoCards.forEach(card => {
+                const spot = card.querySelector('.bento-spot');
+                if (spot) {
+                    card.addEventListener('mousemove', (e) => {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        spot.style.left = `${x}px`;
+                        spot.style.top = `${y}px`;
+                    });
+                }
+            });
+
+            // 6. Timeline Fill Line
+            const timelineTrack = document.getElementById('timeline-track');
+            const timelineFill = document.getElementById('timeline-fill');
+            const timelineSteps = document.querySelectorAll('.timeline-step');
+
+            if (timelineTrack && timelineFill) {
+                gsap.to(timelineFill, {
+                    height: "100%",
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: timelineTrack,
+                        start: "top center",
+                        end: "bottom center",
+                        scrub: true,
+                        onUpdate: (self) => {
+                            const progress = self.progress;
+
+                            timelineSteps.forEach((step, index) => {
+                                const stepProgress = (index + 0.15) / timelineSteps.length;
+
+                                if (progress >= stepProgress) {
+                                    if (!step.classList.contains('timeline-step-active')) {
+                                        step.classList.add('timeline-step-active');
+                                        gsap.to(step, {
+                                            opacity: 1,
+                                            filter: "blur(0px)",
+                                            scale: 1,
+                                            duration: 0.6,
+                                            ease: "back.out(1.5)"
+                                        });
+                                    }
+                                } else {
+                                    if (step.classList.contains('timeline-step-active')) {
+                                        step.classList.remove('timeline-step-active');
+                                        gsap.to(step, {
+                                            opacity: 0.2,
+                                            filter: "blur(4px)",
+                                            scale: 0.98,
+                                            duration: 0.6,
+                                            ease: "power2.out"
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+
+        });
+    </script>
+</body>
+
+</html>

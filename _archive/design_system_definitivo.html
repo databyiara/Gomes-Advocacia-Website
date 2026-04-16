@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A Taça Perfeita - Artools Glass | Design System</title>
+
+    <!-- Fonts based on design system -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        stone: {
+                            50: '#fafaf9',
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            300: '#d6d3d1',
+                            400: '#a8a29e',
+                            500: '#78716c',
+                            600: '#57534e',
+                            700: '#44403c',
+                            800: '#292524',
+                            900: '#1c1917',
+                        },
+                        'surface-light': '#EAEAE5',
+                    },
+                    animation: {
+                        'spin-slow': 'spin 8s linear infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base / Resets from Design System */
+        body {
+            background-color: #EAEAE5;
+            color: #1C1917;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Lenis setup */
+        html.lenis,
+        html.lenis body {
+            height: auto;
+        }
+
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
+        }
+
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+
+        .lenis.lenis-scrolling iframe {
+            pointer-events: none;
+        }
+
+        /* Grid Background from Design System */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image:
+                linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+        }
+
+        /* Noise Grain */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 9999;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .hero-scroll-container {
+            height: 400vh;
+        }
+
+        /* Fix to allow correct overlay of other sections */
+        .hero-layout {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100dvh;
+            z-index: 10;
+        }
+
+        .left-col {
+            position: absolute;
+            inset: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .left-col>* {
+            pointer-events: auto;
+        }
+
+        .right-col {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        @media (min-width: 1024px) {
+            .left-col {
+                padding: 4rem 4rem 4rem 10vw;
+                width: 65%;
+            }
+        }
+
+        /* Video element */
+        .video-container {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            will-change: transform;
+            transform-origin: center center;
+            overflow: hidden;
+            background-color: transparent;
+        }
+
+        #hero-video {
+            width: 100%;
+            height: 100%;
+            transform: translate3d(0, 0, 0);
+            will-change: transform;
+        }
+
+        /* Animations */
+        .gsap-fade-up {
+            opacity: 0;
+            transform: translate3d(0, 40px, 0);
+            will-change: transform, opacity;
+        }
+
+        .gsap-fade {
+            opacity: 0;
+            will-change: opacity, transform;
+        }
+
+        .text-reveal-wrapper {
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: bottom;
+        }
+
+        .text-reveal-content {
+            transform: translateY(110%);
+            opacity: 0;
+            display: block;
+        }
+
+        /* BEAM BUTTON ANIMATION */
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .btn-beam {
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .btn-beam::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            z-index: -1;
+            background: conic-gradient(from 90deg at 50% 50%, #E2E8F0 0%, #1c1917 50%, #E2E8F0 100%);
+            animation: spin 4s linear infinite;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .btn-beam:hover::before {
+            opacity: 1;
+        }
+
+        .btn-beam-content {
+            background-color: #1c1917;
+            color: white;
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #EAEAE5;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e;
+        }
+
+        /* Reveal Animations (Index.html) */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(30px);
+            filter: blur(15px);
+            will-change: transform, opacity, filter;
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-up.active {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
+
+        .reveal-zoom {
+            opacity: 0;
+            transform: scale(0.95);
+            filter: blur(10px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-zoom.active {
+            opacity: 1;
+            transform: scale(1);
+            filter: blur(0);
+        }
+    </style>
+</head>
+
+<body class="selection:bg-stone-900 selection:text-white antialiased min-h-screen relative">
+    <div class="noise"></div>
+
+    <!-- NAVBAR -->
+    <header class="fixed top-0 w-full z-50 transition-transform duration-500 bg-transparent" id="navbar">
+        <div class="flex justify-between items-center px-6 py-4 max-w-[1440px] mx-auto">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-stone-900 text-white flex items-center justify-center rounded-sm">
+                    <iconify-icon icon="solar:glass-water-bold-duotone" class="text-xl"></iconify-icon>
+                </div>
+                <span class="font-display font-medium tracking-tight text-lg text-stone-900">ARTOOLS<span
+                        class="text-stone-500">.GLASS</span></span>
+            </div>
+            <nav class="hidden md:flex items-center gap-8 text-xs font-mono uppercase tracking-widest text-stone-600">
+                <a href="#tech-specs" class="hover:text-stone-900 transition-colors">Design</a>
+                <a href="#experiencia" class="hover:text-stone-900 transition-colors">Detalhes</a>
+                <a href="#cinematic" class="hover:text-stone-900 transition-colors">Especificações</a>
+            </nav>
+            <button class="btn-beam px-1 py-1 rounded-full group">
+                <div
+                    class="btn-beam-content px-5 py-2 rounded-full bg-stone-900 group-hover:bg-stone-800 text-xs font-mono uppercase tracking-widest transition-colors">
+                    Adquirir
+                </div>
+            </button>
+        </div>
+    </header>
+
+    <!-- 1. HERO SCROLL CONTAINER -->
+    <div class="hero-scroll-container relative z-10">
+        <main class="hero-layout bg-transparent">
+            <!-- Right Side: Video Background -->
+            <div class="right-col">
+                <div class="video-container gsap-fade">
+                    <div id="hero-video"></div>
+                </div>
+            </div>
+
+            <!-- Left Side: Content Overlay -->
+            <div class="left-col bg-gradient-to-r from-[#EAEAE5] via-[#EAEAE5]/80 to-transparent relative">
+                <!-- BACKGROUND GRID -->
+                <div class="absolute inset-0 pointer-events-none bg-grid opacity-40"></div>
+
+                <div class="max-w-xl mx-auto lg:mx-0 w-full pt-12 lg:pt-0 relative z-10">
+                    <!-- Label -->
+                    <div
+                        class="gsap-fade-up inline-flex items-center gap-2 mb-8 border border-stone-300 bg-white/50 px-3 py-1.5 rounded-sm">
+                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                        <span class="text-[10px] font-mono uppercase tracking-widest text-stone-500">Edição
+                            Limitada</span>
+                    </div>
+
+                    <!-- Headline -->
+                    <h1
+                        class="font-display text-6xl md:text-8xl font-semibold tracking-tighter text-stone-900 leading-[1.05] mb-6 flex flex-col items-start mix-blend-darken">
+                        <span class="text-reveal-wrapper"><span class="text-reveal-content headline-line">A
+                                Taça</span></span>
+                        <span class="text-reveal-wrapper"><span
+                                class="text-reveal-content headline-line text-stone-400">Perfeita</span></span>
+                    </h1>
+
+                    <!-- Subheadline -->
+                    <p
+                        class="gsap-fade-up text-3xl font-display font-medium text-stone-900 mb-8 leading-relaxed max-w-lg tracking-tight">
+                        Projetada para elevar cada aroma, cada nota e cada momento.
+                    </p>
+
+                    <!-- Short Description -->
+                    <p
+                        class="gsap-fade-up text-lg font-sans text-stone-600 mb-12 max-w-md leading-relaxed font-light text-balance">
+                        Uma obra-prima em cristal, criada para quem valoriza a verdadeira experiência do vinho.
+                    </p>
+
+                    <!-- Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-12">
+                        <button
+                            class="gsap-fade-up px-6 py-4 bg-stone-900 text-white rounded-sm text-xs font-mono uppercase tracking-widest hover:bg-stone-700 hover:-translate-y-1 transition-all duration-300 shadow-xl shadow-stone-900/10 flex justify-center items-center gap-2 group w-full sm:w-auto relative overflow-hidden">
+                            <span class="relative z-10 flex items-center gap-2">
+                                Comprar agora
+                                <iconify-icon icon="solar:arrow-right-linear"
+                                    class="text-base group-hover:translate-x-1 transition-transform"></iconify-icon>
+                            </span>
+                        </button>
+                        <button
+                            class="gsap-fade-up px-6 py-4 border border-stone-300 text-stone-900 bg-transparent rounded-sm text-xs font-mono uppercase tracking-widest hover:bg-white transition-colors duration-300 flex justify-center items-center w-full sm:w-auto">
+                            Explorar detalhes
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Gradient Fade to Next Section -->
+            <div
+                class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-stone-50 to-transparent pointer-events-none z-10">
+            </div>
+        </main>
+    </div>
+
+    <!-- 2. TECH SPECS SECTION -->
+    <section
+        class="relative z-20 bg-stone-50 text-stone-900 py-24 md:py-32 overflow-hidden border-t border-stone-200 bg-grid"
+        id="tech-specs">
+        <div
+            class="absolute inset-0 z-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
+        </div>
+
+        <div class="max-w-[1440px] mx-auto px-6 md:px-24 relative z-10">
+            <!-- Watermark Text -->
+            <div
+                class="absolute top-0 right-0 -mr-24 -mt-24 pointer-events-none select-none opacity-[0.03] z-0 overflow-hidden">
+                <span class="font-display font-bold text-[15rem] leading-none text-stone-900">GLASS</span>
+            </div>
+
+            <!-- Header -->
+            <div class="mb-24 reveal-up relative z-10">
+                <div class="inline-flex items-center gap-2 mb-6">
+                    <span class="w-1.5 h-1.5 bg-stone-400 rounded-full"></span>
+                    <span class="text-xs font-mono uppercase tracking-[0.2em] text-stone-400">Artesanato &
+                        Tecnologia</span>
+                </div>
+                <h2
+                    class="font-display text-5xl md:text-7xl font-medium tracking-tight leading-none text-stone-900 max-w-4xl mix-blend-darken">
+                    Cristal Austríaco.<br>
+                    <span class="text-stone-400">Transparência Absoluta.</span>
+                </h2>
+                <p class="mt-8 text-lg text-stone-500 max-w-2xl font-light leading-relaxed text-balance">
+                    Fundida a mais de 1500°C e moldada com precisão milimétrica, nossa taça une ancestralidade artesanal
+                    com engenharia molecular de ponta para a máxima pureza. A taça mais fina para os paladares mais
+                    precisos.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+                <!-- Left Visual -->
+                <div class="lg:col-span-7 relative group perspective-1000">
+                    <div
+                        class="absolute inset-0 bg-stone-200/50 rounded-2xl transform rotate-2 scale-[0.98] transition-transform duration-700 group-hover:rotate-1">
+                    </div>
+
+                    <div
+                        class="relative rounded-2xl overflow-hidden aspect-[4/3] bg-stone-100 reveal-up delay-200 shadow-2xl shadow-stone-200/50 transform transition-transform duration-700 group-hover:-translate-y-2">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent z-20 translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-[1.5s] ease-in-out pointer-events-none">
+                        </div>
+
+                        <img src="assets/raw_files/taca_premium.png" alt="Artools Glass Detail"
+                            class="w-full h-full object-cover grayscale-[30%] contrast-110 group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100 mix-blend-multiply">
+
+                        <!-- Overlay UI Elements -->
+                        <div
+                            class="absolute top-8 left-8 p-4 border border-white/40 rounded-lg backdrop-blur-md bg-white/30 shadow-lg text-stone-800 hover:bg-white/50 transition-colors cursor-crosshair">
+                            <iconify-icon icon="solar:star-fall-minimalistic-bold-duotone"
+                                class="text-2xl text-stone-800 mb-2"></iconify-icon>
+                            <div class="text-[10px] font-mono text-stone-600 tracking-widest uppercase">Pureza_Titânio
+                            </div>
+                            <div class="h-0.5 w-full bg-stone-900/20 mt-2 rounded-full overflow-hidden">
+                                <div class="h-full w-[98%] bg-stone-900"></div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="absolute bottom-8 right-8 p-4 border border-white/40 rounded-lg backdrop-blur-md bg-white/30 shadow-lg text-right hover:bg-white/50 transition-colors cursor-crosshair">
+                            <div class="text-3xl font-display font-bold text-stone-900">0.8<span
+                                    class="text-sm text-stone-500 font-mono align-top ml-1">mm</span></div>
+                            <div class="text-[10px] font-mono text-stone-600 tracking-widest uppercase">Espessura_Borda
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Content (List) -->
+                <div class="lg:col-span-5 space-y-8">
+                    <!-- Feature 01 -->
+                    <div
+                        class="reveal-up delay-300 group cursor-crosshair p-6 rounded-xl hover:bg-white hover:shadow-xl hover:shadow-stone-200/50 transition-all duration-500 border border-transparent hover:border-stone-100">
+                        <div class="flex items-baseline gap-4 mb-3">
+                            <span
+                                class="text-xs font-mono text-stone-400 group-hover:text-stone-900 group-hover:scale-110 transition-all duration-300">01</span>
+                            <h3
+                                class="text-2xl font-display font-medium text-stone-900 group-hover:translate-x-1 transition-transform duration-300">
+                                Cristal de Titânio</h3>
+                        </div>
+                        <p
+                            class="pl-8 text-stone-500 text-sm leading-relaxed group-hover:text-stone-600 transition-colors border-l border-stone-200 group-hover:border-stone-900 pl-4">
+                            Sua estrutura molecular orgânica é infundida com titânio, garantindo um brilho vítreo
+                            excepcional e incomparável. Total resistência contra impactos na base e livre de chumbo.
+                        </p>
+                    </div>
+
+                    <!-- Feature 02 -->
+                    <div
+                        class="reveal-up delay-500 group cursor-crosshair p-6 rounded-xl hover:bg-white hover:shadow-xl hover:shadow-stone-200/50 transition-all duration-500 border border-transparent hover:border-stone-100">
+                        <div class="flex items-baseline gap-4 mb-3">
+                            <span
+                                class="text-xs font-mono text-stone-400 group-hover:text-stone-900 group-hover:scale-110 transition-all duration-300">02</span>
+                            <h3
+                                class="text-2xl font-display font-medium text-stone-900 group-hover:translate-x-1 transition-transform duration-300">
+                                Bojo Otimizado</h3>
+                        </div>
+                        <p
+                            class="pl-8 text-stone-500 text-sm leading-relaxed group-hover:text-stone-600 transition-colors border-l border-stone-200 group-hover:border-stone-900 pl-4">
+                            A geometria elíptica perfeita maximiza a superfície de contato. Ela acelera a evaporação do
+                            etanol e oxigenação, liberando até os aromas mais fechados em instantes imperceptíveis ao
+                            tempo.
+                        </p>
+                    </div>
+
+                    <!-- Feature 03 -->
+                    <div
+                        class="reveal-up delay-700 group cursor-crosshair p-6 rounded-xl hover:bg-white hover:shadow-xl hover:shadow-stone-200/50 transition-all duration-500 border border-transparent hover:border-stone-100">
+                        <div class="flex items-baseline gap-4 mb-3">
+                            <span
+                                class="text-xs font-mono text-stone-400 group-hover:text-stone-900 group-hover:scale-110 transition-all duration-300">03</span>
+                            <h3
+                                class="text-2xl font-display font-medium text-stone-900 group-hover:translate-x-1 transition-transform duration-300">
+                                Corte a Laser Frio</h3>
+                        </div>
+                        <p
+                            class="pl-8 text-stone-500 text-sm leading-relaxed group-hover:text-stone-600 transition-colors border-l border-stone-200 group-hover:border-stone-900 pl-4">
+                            A fina borda de 0.8mm é esculpida a laser e suavemente polida ao fogo. Este diferencial
+                            milimétrico faz o fluxo do vinho atingir seus receptores gustativos sem barreiras espessas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. TASTING EXPERIENCE (FLASHLIGHT CARDS) -->
+    <section class="relative z-20 bg-[#EAEAE5] py-24 md:py-32 overflow-hidden border-t border-stone-300"
+        id="experiencia">
+        <div class="max-w-[1440px] mx-auto px-6 md:px-24">
+            <div class="text-center mb-24 reveal-up">
+                <span class="text-xs font-mono uppercase tracking-[0.2em] text-stone-500 mb-6 block">Degustação
+                    Elevada</span>
+                <h2
+                    class="font-display text-5xl md:text-6xl font-medium tracking-tight text-stone-900 max-w-3xl mx-auto">
+                    A essência do terroir,<br>
+                    <span class="text-stone-400">em suas mãos.</span>
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="flashlight-card h-[400px] border border-stone-300 bg-white p-8 flex flex-col justify-between rounded-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 group reveal-up delay-200"
+                    onmousemove="updateFlashlight(event, this)">
+                    <div
+                        class="w-12 h-12 bg-stone-100 rounded-lg flex items-center justify-center text-stone-900 mb-6 group-hover:bg-stone-900 group-hover:text-white transition-colors duration-500">
+                        <iconify-icon icon="solar:tornado-small-linear" class="text-2xl"></iconify-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-display font-medium mb-3">Aeração Circular</h3>
+                        <p class="text-stone-500 text-sm leading-relaxed">O design com vórtice fluído proporciona
+                            correntes ascendentes perfeitas ao girar a taça. Cada movimento intensifica imediatamente as
+                            assinaturas aromáticas de forma única e natural.</p>
+                    </div>
+                    <div class="h-1 w-full bg-stone-100 mt-8 overflow-hidden">
+                        <div class="h-full bg-stone-900 w-0 group-hover:w-full transition-all duration-700 ease-out">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="flashlight-card h-[400px] border border-stone-300 bg-white p-8 flex flex-col justify-between rounded-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 group reveal-up delay-400"
+                    onmousemove="updateFlashlight(event, this)">
+                    <div
+                        class="w-12 h-12 bg-stone-100 rounded-lg flex items-center justify-center text-stone-900 mb-6 group-hover:bg-stone-900 group-hover:text-white transition-colors duration-500">
+                        <iconify-icon icon="solar:music-note-2-linear" class="text-2xl"></iconify-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-display font-medium mb-3">Acústica Cristalina</h3>
+                        <p class="text-stone-500 text-sm leading-relaxed">Cada brinde revela o som agudo e límpido
+                            oriundo de 100% de pureza do cristal. Uma ressonância audível, longa e memorável que marca
+                            perfeitamente a celebração.</p>
+                    </div>
+                    <div class="h-1 w-full bg-stone-100 mt-8 overflow-hidden">
+                        <div
+                            class="h-full bg-stone-900 w-0 group-hover:w-full transition-all duration-700 ease-out delay-100">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="flashlight-card h-[400px] border border-stone-300 bg-white p-8 flex flex-col justify-between rounded-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 group reveal-up delay-600"
+                    onmousemove="updateFlashlight(event, this)">
+                    <div
+                        class="w-12 h-12 bg-stone-100 rounded-lg flex items-center justify-center text-stone-900 mb-6 group-hover:bg-stone-900 group-hover:text-white transition-colors duration-500">
+                        <iconify-icon icon="solar:scale-linear" class="text-2xl"></iconify-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-display font-medium mb-3">Gravidade Neutra</h3>
+                        <p class="text-stone-500 text-sm leading-relaxed">A haste foi modelada ergonomicamente. O
+                            contrapeso resultante entre a base e o bojo faz com que o peso da taça não exista. O prazer
+                            de segurar torna-se apenas uma extensão dos seus dedos.</p>
+                    </div>
+                    <div class="h-1 w-full bg-stone-100 mt-8 overflow-hidden">
+                        <div
+                            class="h-full bg-stone-900 w-0 group-hover:w-full transition-all duration-700 ease-out delay-200">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Background Decor -->
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-stone-200/50 rounded-full blur-3xl -z-10 animate-pulse pointer-events-none mix-blend-multiply">
+        </div>
+    </section>
+
+    <!-- 4. CINEMATIC SHOWCASE -->
+    <section class="h-screen w-full relative overflow-hidden flex items-center justify-center bg-stone-900 z-20"
+        id="cinematic">
+        <!-- Background Video -->
+        <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover">
+            <source src="assets/raw_files/video3.mp4" type="video/mp4">
+        </video>
+
+        <!-- Overlay Texture -->
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm z-0"></div>
+
+        <!-- Glowing Card -->
+        <div class="relative group z-10 reveal-zoom delay-200">
+            <div
+                class="absolute -inset-0.5 bg-gradient-to-r from-stone-100 to-stone-500 rounded-2xl blur opacity-20 group-hover:opacity-75 transition duration-1000 group-hover:duration-200">
+            </div>
+
+            <div
+                class="absolute -inset-[2px] rounded-2xl overflow-hidden opacity-0 group-hover:opacity-100 transition duration-500">
+                <div
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] bg-[conic-gradient(from_0deg,transparent_0_340deg,white_360deg)] animate-spin-slow">
+                </div>
+            </div>
+
+            <div
+                class="relative px-12 py-16 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl flex flex-col items-center justify-center text-center shadow-2xl">
+                <div
+                    class="mb-6 w-16 h-16 bg-white rounded-full flex items-center justify-center text-black shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+                    <iconify-icon icon="solar:star-circle-bold-duotone" class="text-3xl"></iconify-icon>
+                </div>
+
+                <h2 class="font-display text-4xl md:text-5xl font-bold text-white mb-2 tracking-tight">Artools<span
+                        class="font-light text-stone-400">Glass</span></h2>
+                <div class="h-px w-12 bg-stone-500 my-4"></div>
+                <p class="font-mono text-xs uppercase tracking-[0.3em] text-stone-300 mb-8">Reserve Edition • 2026</p>
+
+                <button
+                    class="relative group/btn overflow-hidden rounded-full bg-white text-black px-8 py-3 font-medium text-sm hover:scale-105 transition-transform">
+                    <span class="relative z-10 flex items-center gap-2">
+                        Reservar Agora
+                        <iconify-icon icon="solar:arrow-right-linear"></iconify-icon>
+                    </span>
+                    <div
+                        class="absolute inset-0 bg-stone-200 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300">
+                    </div>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-stone-950 text-stone-500 py-12 border-t border-stone-800 relative z-20">
+        <div class="max-w-[1440px] mx-auto px-6 md:px-24 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 bg-stone-800 text-stone-300 flex items-center justify-center rounded-sm">
+                    <iconify-icon icon="solar:glass-water-bold-duotone" class="text-sm"></iconify-icon>
+                </div>
+                <span class="font-display font-medium tracking-tight text-sm text-stone-300">ARTOOLS<span
+                        class="text-stone-600">.GLASS</span></span>
+            </div>
+            <div class="text-xs font-mono uppercase tracking-widest flex gap-6">
+                <a href="#" class="hover:text-stone-300 transition-colors">Privacy</a>
+                <a href="#" class="hover:text-stone-300 transition-colors">Terms</a>
+                <a href="#" class="hover:text-stone-300 transition-colors">Support</a>
+            </div>
+            <div class="text-xs text-stone-600 flex flex-col md:items-end gap-1">
+                <span>&copy; 2026 Artools Glass. Zurich.</span>
+                <span>Desenvolvido por Iara Gomes</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/split-type"></script>
+    <script src="https://cdn.jsdelivr.net/npm/scrolly-video@latest/dist/scrolly-video.js"></script>
+
+    <script>
+        // Lenis Smooth Scroll
+        const lenis = new Lenis({
+            duration: 1.5,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            direction: 'vertical',
+            gestureDirection: 'vertical',
+            smooth: true,
+            mouseMultiplier: 1,
+            touchMultiplier: 2,
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        gsap.registerPlugin(ScrollTrigger);
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+        gsap.ticker.lagSmoothing(0);
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+            tl.fromTo(".gsap-fade", { opacity: 0, scale: 1.05 }, { opacity: 1, scale: 1, duration: 2.5, ease: "power2.out" }, 0.2);
+            tl.to(".headline-line", { opacity: 1, y: "0%", duration: 1.2, stagger: 0.2, ease: "power3.out" }, 0.4);
+            tl.fromTo(".gsap-fade-up", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.5, stagger: 0.15, ease: "power3.out" }, 0.8);
+        });
+
+        // Flashlight effect
+        window.updateFlashlight = function (e, card) {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty("--mouse-x", `${x}px`);
+            card.style.setProperty("--mouse-y", `${y}px`);
+        };
+
+        // Standard Reveals
+        gsap.utils.toArray('section .reveal-up, section .reveal-zoom').forEach(function (elem) {
+            ScrollTrigger.create({
+                trigger: elem,
+                start: "top 85%",
+                onEnter: function () { elem.classList.add('active'); }
+            });
+        });
+
+        // Scrolly Video
+        const scrollyVideoContainer = document.getElementById('hero-video');
+        const scrollyVideo = new ScrollyVideo({
+            scrollyVideoContainer: scrollyVideoContainer,
+            src: 'assets/raw_files/video1.mp4',
+            trackScroll: false,
+            transitionSpeed: 0
+        });
+
+        const initScrubbing = () => {
+            const scrollTl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: ".hero-scroll-container",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 1,
+                    onUpdate: (self) => {
+                        if (scrollyVideo) scrollyVideo.setTargetTimePercent(self.progress);
+                    }
+                }
+            });
+            scrollTl.fromTo(".video-container", { scale: 1, y: 0 }, { scale: 1.1, y: 50, ease: "none" }, 0);
+
+            gsap.to(".left-col .max-w-xl > *", {
+                y: -60,
+                opacity: 0,
+                filter: "blur(15px)",
+                stagger: 0.05,
+                scrollTrigger: {
+                    trigger: ".hero-scroll-container",
+                    start: "top top",
+                    end: "15% top",
+                    scrub: true
+                }
+            });
+        };
+
+        if (scrollyVideoContainer) initScrubbing();
+    </script>
+</body>
+
+</html>

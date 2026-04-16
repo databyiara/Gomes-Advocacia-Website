@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html class="scroll-smooth dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Aether Design System</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="templates/aether-technology.aura.build/assets/resource_3fa48481346f.js"></script>
+  <!-- Three.js & GSAP -->
+  <script src="templates/aether-technology.aura.build/assets/three_1aecfa5aa56f.js"></script>
+  <script src="templates/aether-technology.aura.build/assets/gsap_4a57399e4113.js"></script>
+  <script src="templates/aether-technology.aura.build/assets/ScrollTrigger_8669edfeb171.js"></script>
+  
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="templates/aether-technology.aura.build/assets/css2_2832c0ff631d.css" rel="stylesheet"/>
+  
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: { sans: ["Inter", "sans-serif"], mono: ["JetBrains Mono", "monospace"] },
+          colors: {
+            bgDark: "#020202",
+            surfaceDark: "#0a0a0a",
+            borderDark: "rgba(255, 255, 255, 0.06)",
+            textDark: "#EAEAEA",
+            bgLight: "#F3F4F6",
+            surfaceLight: "#FFFFFF",
+            borderLight: "rgba(0, 0, 0, 0.08)",
+            textLight: "#1F2937",
+            accent: "#10B981",
+            accentGlow: "#34D399",
+            primary: "#ffffff",
+            secondary: "#10b981",
+            neutral: "#a3a3a3",
+            feedback: "#3b82f6",
+            warning: "#f59e0b",
+            danger: "#ef4444"
+          },
+          animation: {
+            beam: "beam 3s linear infinite",
+            "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+            "float": "float 6s ease-in-out infinite",
+          },
+          keyframes: {
+            beam: {
+              "0%": { strokeDashoffset: "1000" },
+              "100%": { strokeDashoffset: "0" },
+            },
+            float: {
+              "0%, 100%": { transform: "translateY(0)" },
+              "50%": { transform: "translateY(-10px)" }
+            }
+          },
+        },
+      },
+    };
+  </script>
+  
+  <style>
+    body {
+      background-color: #020202;
+      color: #eaeaea;
+      transition: background-color 0.5s ease, color 0.5s ease;
+      overflow-x: hidden;
+    }
+    
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    .glass-card {
+      background: linear-gradient(180deg, rgba(20,20,20,0.65), rgba(8,8,8,0.75));
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 25px 80px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.06);
+      transition: transform 450ms cubic-bezier(0.16,1,0.3,1), border-color 450ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .glass-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(16,185,129,0.4);
+    }
+    
+    .hero-glow {
+      position: absolute;
+      width: 820px;
+      height: 820px;
+      border-radius: 9999px;
+      pointer-events: none;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      filter: blur(70px);
+      opacity: 1;
+      background: radial-gradient(circle at 45% 40%, rgba(16, 185, 129, 0.18) 0%, rgba(16, 185, 129, 0.06) 38%, transparent 70%),
+                  radial-gradient(circle at 55% 60%, rgba(255, 255, 255, 0.06) 0%, transparent 55%);
+    }
+    
+    .bg-grid {
+      background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    
+    .text-gradient-green {
+      background: linear-gradient(135deg, #6ee7b7, #10b981, #059669);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .text-transparent-white {
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.8);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+      -webkit-background-clip: text;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .anim-float { animation: float 6s ease-in-out infinite; }
+    .anim-pulse-subtle { animation: pulseSubtle 3s ease-in-out infinite; }
+    
+    @keyframes pulseSubtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    .btn-primary {
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(16,185,129,0.25), 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .btn-primary::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .btn-primary:hover::after { opacity: 1; }
+    
+    /* Atmosphere fog */
+    .atmosphere-fog {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+      animation: fogFlow 20s linear infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+    @keyframes fogFlow {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.1); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-accent/30 selection:text-white">
+
+  <!-- Background Layer -->
+  <div class="fixed inset-0 bg-grid opacity-50 z-[-2]"></div>
+  <div class="fixed inset-0 bg-gradient-to-b from-transparent to-[#020202] z-[-1]"></div>
+  <div class="atmosphere-fog"></div>
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 w-full z-50 bg-[#020202]/70 backdrop-blur-2xl border-b border-white/[0.06]">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-6 h-6 bg-accent rounded-md flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+          <div class="w-2 h-2 bg-white rounded-full"></div>
+        </div>
+        <span class="font-bold tracking-widest text-white text-sm uppercase">Aether UI</span>
+      </div>
+      <div class="hidden md:flex items-center gap-8 text-[13px] font-medium text-neutral-400">
+        <a class="hover:text-white transition-colors duration-300" href="#typography">Typography</a>
+        <a class="hover:text-white transition-colors duration-300" href="#colors">Colors</a>
+        <a class="hover:text-white transition-colors duration-300" href="#components">Components</a>
+        <a class="hover:text-white transition-colors duration-300" href="#animations">Animations</a>
+      </div>
+      <button class="px-5 py-2 text-[12px] font-semibold bg-white text-black rounded-full hover:scale-[1.05] transition-transform shadow-lg">
+        Download
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+    <div class="hero-glow"></div>
+    <div class="max-w-4xl mx-auto text-center px-6 relative z-10">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/20 bg-accent/10 backdrop-blur-md mb-8 reveal active">
+        <span class="w-2 h-2 rounded-full bg-accent animate-pulse-slow shadow-[0_0_8px_#10B981]"></span>
+        <span class="text-xs font-semibold text-accent uppercase tracking-[0.2em]">Design System v1.0</span>
+      </div>
+      <h1 class="text-6xl md:text-[7rem] font-bold tracking-tighter mb-6 leading-none reveal active text-transparent-white anim-float">
+        AURA<br>
+        <span class="text-white">AESTHETICS</span>
+      </h1>
+      <p class="text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed font-light reveal active delay-100">
+        A comprehensive design language built for the future. Transparent, elegant, and deeply fluid. Everything you need to construct digital realities.
+      </p>
+      
+      <div class="mt-12 flex flex-col sm:flex-row items-center justify-center gap-5 reveal active delay-200">
+        <a href="#components" class="btn-primary h-12 px-8 bg-accent hover:bg-accentGlow text-white text-sm font-semibold rounded-full transition-all duration-300 flex items-center justify-center gap-2">
+          Explore Components
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+        <a href="#colors" class="h-12 px-8 rounded-full text-sm font-medium flex items-center justify-center transition-all bg-white/5 border border-white/10 text-neutral-200 backdrop-blur-xl hover:bg-white/10 hover:-translate-y-1 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+          View Specifications
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Typography -->
+  <section id="typography" class="py-32 px-6 relative border-b border-white/[0.04]">
+    <div class="max-w-6xl mx-auto">
+      <div class="mb-16 reveal">
+        <p class="text-xs font-bold uppercase tracking-[0.3em] text-accent mb-4">Foundation 01</p>
+        <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-white mb-6">Typography</h2>
+        <p class="text-neutral-400 max-w-2xl text-lg font-light">
+          Primary font: <span class="text-white font-medium">Inter</span>. Fallback: sans-serif. Used for clear, modern interfaces.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+        <div class="space-y-10 reveal">
+          <div class="glass-card p-8 rounded-2xl">
+            <h3 class="text-neutral-500 text-xs uppercase tracking-[0.2em] mb-6">Headings Scale</h3>
+            
+            <div class="space-y-6">
+              <div class="flex items-end justify-between border-b border-white/[0.05] pb-4">
+                <h1 class="text-6xl font-bold tracking-tighter text-white">Display 1</h1>
+                <span class="text-xs text-neutral-500 font-mono">60px / Bold / -2%</span>
+              </div>
+              <div class="flex items-end justify-between border-b border-white/[0.05] pb-4">
+                <h2 class="text-5xl font-semibold tracking-tight text-white">Heading 2</h2>
+                <span class="text-xs text-neutral-500 font-mono">48px / Semibold / -1%</span>
+              </div>
+              <div class="flex items-end justify-between border-b border-white/[0.05] pb-4">
+                <h3 class="text-4xl font-semibold text-white">Heading 3</h3>
+                <span class="text-xs text-neutral-500 font-mono">36px / Semibold / 0%</span>
+              </div>
+              <div class="flex items-end justify-between border-b border-white/[0.05] pb-4">
+                <h4 class="text-3xl font-medium text-white">Heading 4</h4>
+                <span class="text-xs text-neutral-500 font-mono">30px / Medium / 1%</span>
+              </div>
+              <div class="flex items-end justify-between border-b border-white/[0.05] pb-4">
+                <h5 class="text-xl font-medium text-white">Heading 5</h5>
+                <span class="text-xs text-neutral-500 font-mono">20px / Medium / 1%</span>
+              </div>
+              <div class="flex items-end justify-between">
+                <h6 class="text-lg font-medium text-white">Heading 6</h6>
+                <span class="text-xs text-neutral-500 font-mono">18px / Medium / 1%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-10 reveal">
+          <div class="glass-card p-8 rounded-2xl">
+            <h3 class="text-neutral-500 text-xs uppercase tracking-[0.2em] mb-6">Body & Labels</h3>
+            <div class="space-y-8">
+              <div>
+                <span class="text-white text-lg font-light leading-relaxed block overflow-hidden">Body Large - The convergence of data and aesthetics. Bridging the gap between simulation and reality.</span>
+                <span class="text-xs text-neutral-500 font-mono mt-2 block">18px / Light / 160%</span>
+              </div>
+              <div>
+                <span class="text-neutral-300 text-base leading-relaxed block">Body Standard - Complex logic gates rendered into seamless, glowing execution flows without legacy code.</span>
+                <span class="text-xs text-neutral-500 font-mono mt-2 block">16px / Regular / 150%</span>
+              </div>
+              <div>
+                <span class="text-neutral-400 text-sm block">Body Small - Real-time synchronization across every node.</span>
+                <span class="text-xs text-neutral-500 font-mono mt-2 block">14px / Regular / 150%</span>
+              </div>
+              <div>
+                <span class="text-accent text-xs uppercase tracking-widest font-semibold block">Label & Caption</span>
+                <span class="text-xs text-neutral-500 font-mono mt-2 block">12px / Semibold / 150% / +10%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Colors -->
+  <section id="colors" class="py-32 px-6 relative border-b border-white/[0.04]">
+    <div class="max-w-6xl mx-auto">
+      <div class="mb-16 reveal">
+        <p class="text-xs font-bold uppercase tracking-[0.3em] text-accent mb-4">Foundation 02</p>
+        <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-white mb-6">Color System</h2>
+        <p class="text-neutral-400 max-w-2xl text-lg font-light">
+          Deep, immersive dark tones contrasted with glowing accents and crisp whites. Designed for AAA contrast and visual hierarchy.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 reveal">
+        <!-- Color Block -->
+        <div class="glass-card p-5 rounded-2xl group">
+          <div class="h-24 w-full rounded-xl bg-[#020202] border border-white/10 mb-4 transition-transform group-hover:scale-[1.03]"></div>
+          <h4 class="text-white font-medium mb-1">Background Dark</h4>
+          <p class="text-xs text-neutral-500 font-mono">HEX #020202</p>
+          <p class="text-xs text-neutral-500 font-mono">RGB 2, 2, 2</p>
+          <p class="text-[10px] text-neutral-600 mt-2">Role: App Base Canvas</p>
+        </div>
+        <div class="glass-card p-5 rounded-2xl group">
+          <div class="h-24 w-full rounded-xl bg-[#10b981] shadow-[0_0_20px_rgba(16,185,129,0.3)] mb-4 transition-transform group-hover:scale-[1.03]"></div>
+          <h4 class="text-white font-medium mb-1">Primary Accent</h4>
+          <p class="text-xs text-neutral-500 font-mono">HEX #10B981</p>
+          <p class="text-xs text-neutral-500 font-mono">RGB 16, 185, 129</p>
+          <p class="text-[10px] text-neutral-600 mt-2">Role: CTA, Highlights</p>
+        </div>
+        <div class="glass-card p-5 rounded-2xl group">
+          <div class="h-24 w-full rounded-xl bg-white mb-4 transition-transform group-hover:scale-[1.03]"></div>
+          <h4 class="text-black font-medium mb-1 text-white">Surface White</h4>
+          <p class="text-xs text-neutral-500 font-mono">HEX #FFFFFF</p>
+          <p class="text-xs text-neutral-500 font-mono">RGB 255, 255, 255</p>
+          <p class="text-[10px] text-neutral-600 mt-2">Role: Primary Text, Light Elements</p>
+        </div>
+        <div class="glass-card p-5 rounded-2xl group">
+          <div class="h-24 w-full rounded-xl bg-[rgba(255,255,255,0.06)] border border-white/10 mb-4 transition-transform group-hover:scale-[1.03]"></div>
+          <h4 class="text-white font-medium mb-1">Glass / Border</h4>
+          <p class="text-xs text-neutral-500 font-mono">HEX #FFFFFF</p>
+          <p class="text-xs text-neutral-500 font-mono">Opacity 6%</p>
+          <p class="text-[10px] text-neutral-600 mt-2">Role: Cards, Separators</p>
+        </div>
+      </div>
+      
+      <!-- Gradients -->
+      <div class="mt-12 reveal">
+        <h3 class="text-neutral-400 text-sm uppercase tracking-widest mb-6 border-b border-white/10 pb-2">Gradients</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="glass-card p-6 rounded-2xl flex items-center gap-6">
+            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-[#6ee7b7] via-[#10b981] to-[#059669]"></div>
+            <div>
+              <h4 class="text-white font-medium">Text Gradient Green</h4>
+              <p class="text-xs text-neutral-500 font-mono mt-1">Linear 135deg, #6ee7b7, #10b981, #059669</p>
+            </div>
+          </div>
+          <div class="glass-card p-6 rounded-2xl flex items-center gap-6">
+            <div class="w-20 h-20 rounded-full bg-gradient-to-b from-white to-transparent border border-white/20"></div>
+            <div>
+              <h4 class="text-white font-medium">Transparent White</h4>
+              <p class="text-xs text-neutral-500 font-mono mt-1">Linear 180deg, rgba(255,255,255,1), rgba(255,255,255,0)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Components -->
+  <section id="components" class="py-32 px-6 relative border-b border-white/[0.04] overflow-hidden">
+    <div class="max-w-6xl mx-auto">
+      <div class="mb-16 reveal">
+        <p class="text-xs font-bold uppercase tracking-[0.3em] text-accent mb-4">Foundation 03</p>
+        <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-white mb-6">UI Components</h2>
+        <p class="text-neutral-400 max-w-2xl text-lg font-light">
+          Interactive, glassmorphic UI elements featuring subtle hover states, glow effects, and smooth transitions.
+        </p>
+      </div>
+
+      <div class="space-y-20">
+        
+        <!-- Buttons & Inputs -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 reveal">
+          <div class="space-y-6">
+            <h3 class="text-xl font-medium text-white border-b border-white/10 pb-2">Buttons</h3>
+            <div class="flex flex-wrap gap-4 items-center p-6 glass-card rounded-2xl">
+              <button class="btn-primary h-11 px-7 bg-accent hover:bg-accentGlow text-white text-[13px] font-semibold rounded-full transition-all duration-300">
+                Primary Action 
+              </button>
+              <button class="h-11 px-7 rounded-full text-[13px] font-medium transition-all duration-300 bg-white/5 border border-white/10 text-neutral-200 hover:bg-white/10 hover:-translate-y-[1px] shadow-lg">
+                Secondary
+              </button>
+              <button class="w-11 h-11 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          
+          <div class="space-y-6">
+            <h3 class="text-xl font-medium text-white border-b border-white/10 pb-2">Inputs</h3>
+            <div class="p-6 glass-card rounded-2xl space-y-4">
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-neutral-500 mb-2">Email Address</label>
+                <input type="email" placeholder="system@aether.com" class="w-full h-11 px-4 bg-[#0a0a0a] border border-white/10 rounded-xl text-white outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/50 transition-all font-light text-sm">
+              </div>
+              <div class="flex gap-2">
+                <input type="text" placeholder="Search components..." class="flex-1 h-11 px-4 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:bg-white/10 transition-all font-light text-sm">
+                <button class="h-11 px-6 rounded-xl bg-white text-black text-sm font-semibold hover:bg-neutral-200 transition-colors">Go</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Badges & Tooltips -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 reveal">
+          <div class="space-y-6">
+            <h3 class="text-xl font-medium text-white border-b border-white/10 pb-2">Badges & Tags</h3>
+            <div class="flex flex-wrap gap-4 items-center p-8 glass-card rounded-2xl">
+              <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent/20 bg-accent/10 backdrop-blur-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-slow"></span>
+                <span class="text-[10px] font-semibold text-accent uppercase tracking-[0.1em]">Online</span>
+              </span>
+              <span class="px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs text-neutral-300">
+                Neutral Tag
+              </span>
+              <span class="px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/10 text-xs text-blue-400">
+                Processing
+              </span>
+              <span class="px-3 py-1 rounded-full border border-red-500/20 bg-red-500/10 text-xs text-red-400">
+                Error State
+              </span>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <h3 class="text-xl font-medium text-white border-b border-white/10 pb-2">Micro-Components</h3>
+            <div class="relative h-32 p-6 glass-card rounded-2xl flex items-center justify-center">
+              <div class="absolute inset-0 bg-grid opacity-20"></div>
+              
+              <!-- Popover component from template -->
+              <div class="relative z-10 bg-[rgba(20,20,20,0.8)] border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.4)] backdrop-blur-md px-5 py-3 rounded-2xl anim-float flex flex-col gap-1 w-48">
+                <div class="text-[10px] font-bold uppercase tracking-widest text-accent mb-1">Popup Card</div>
+                <div class="text-sm font-semibold text-white">Neural Lattice</div>
+                <div class="text-xs text-neutral-400 font-light mt-1">Self-healing mesh topology active.</div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+        
+        <!-- Cards & Modals -->
+        <div class="space-y-6 reveal">
+          <h3 class="text-xl font-medium text-white border-b border-white/10 pb-2">Cards & Layout Pieces</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Bento Card 1 -->
+            <article class="p-7 rounded-[22px] border border-white/10 bg-white/[0.04] backdrop-blur-xl hover:border-accent/40 transition-colors group">
+              <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-6 group-hover:bg-accent/20 transition-colors">
+                <svg class="w-5 h-5 text-neutral-400 group-hover:text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
+              </div>
+              <h4 class="text-lg font-semibold text-white mb-2">Bento Box Card</h4>
+              <p class="text-sm text-neutral-400 mb-6 font-light">Versatile container for complex layouts. Supports hover states and inner grid elements.</p>
+              <div class="mt-auto flex items-center text-xs text-accent font-medium uppercase tracking-wider group-hover:gap-2 transition-all cursor-pointer">
+                <span>View Specs</span> <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-width="2"/></svg>
+              </div>
+            </article>
+
+            <!-- Media Card -->
+            <article class="p-4 rounded-[22px] glass-card overflow-hidden group">
+              <div class="w-full h-32 rounded-xl bg-white/5 relative overflow-hidden mb-4">
+                <div class="absolute inset-0 bg-gradient-to-tr from-accent/20 to-blue-500/20 mix-blend-overlay"></div>
+                <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent"></div>
+              </div>
+              <h4 class="text-base font-medium text-white px-2">Media Integration</h4>
+              <p class="text-xs text-neutral-500 px-2 mt-1">Image and video containers with inner shadow effects.</p>
+            </article>
+
+            <!-- System Node Card -->
+            <article class="p-5 rounded-2xl bg-[#111] border border-white/10 relative overflow-hidden group hover:-translate-y-1 transition-transform">
+              <div class="flex items-center gap-3 mb-4">
+                <span class="w-8 h-8 bg-white/5 border border-white/10 text-white rounded-lg flex items-center justify-center font-bold text-xs">A</span>
+                <span class="font-medium text-white text-sm">System Node</span>
+              </div>
+              <div class="space-y-2 mb-4">
+                <div class="h-1 bg-white/10 rounded-full w-full"></div>
+                <div class="h-1 bg-accent/80 rounded-full w-3/4 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+              </div>
+              <p class="text-[10px] text-neutral-500 uppercase tracking-widest block">Flow Process active</p>
+            </article>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Icons -->
+  <section id="icons" class="py-32 px-6 relative border-b border-white/[0.04]">
+    <div class="max-w-6xl mx-auto text-center reveal">
+      <p class="text-xs font-bold uppercase tracking-[0.3em] text-accent mb-4">Foundation 04</p>
+      <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-white mb-12">Iconography</h2>
+      
+      <div class="flex flex-wrap justify-center gap-8">
+        <div class="w-16 h-16 rounded-2xl glass-card flex items-center justify-center hover:bg-white/5 transition-colors group">
+          <svg class="w-6 h-6 text-neutral-300 group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke-width="1.5"/></svg>
+        </div>
+        <div class="w-16 h-16 rounded-2xl glass-card flex items-center justify-center hover:bg-white/5 transition-colors group">
+          <svg class="w-6 h-6 text-neutral-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" stroke-width="1.5"/></svg>
+        </div>
+        <div class="w-16 h-16 rounded-2xl glass-card flex items-center justify-center hover:bg-white/5 transition-colors group">
+          <svg class="w-6 h-6 text-neutral-300 group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        </div>
+        <div class="w-16 h-16 rounded-2xl glass-card flex items-center justify-center hover:bg-white/5 transition-colors group">
+          <svg class="w-6 h-6 text-neutral-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        </div>
+        <div class="w-16 h-16 rounded-2xl glass-card flex items-center justify-center hover:bg-white/5 transition-colors group">
+          <svg class="w-6 h-6 text-neutral-300 group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        </div>
+        <div class="w-16 h-16 rounded-2xl glass-card flex items-center justify-center hover:bg-white/5 transition-colors group">
+          <svg class="w-6 h-6 text-neutral-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Animations -->
+  <section id="animations" class="py-32 px-6 relative border-b border-white/[0.04]">
+    <div class="max-w-6xl mx-auto">
+      <div class="mb-16 reveal">
+        <p class="text-xs font-bold uppercase tracking-[0.3em] text-accent mb-4">Foundation 05</p>
+        <h2 class="text-4xl md:text-5xl font-semibold tracking-tight text-white mb-6">Motions & FX</h2>
+        <p class="text-neutral-400 max-w-2xl text-lg font-light">
+          Defining spatial flow, emergence, and interactive life.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+        <div class="flex flex-col items-center gap-6 glass-card p-10 rounded-2xl reveal">
+           <div class="w-16 h-16 box bg-accent/20 border border-accent rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.5)] anim-pulse-subtle"></div>
+           <div>
+             <h4 class="text-white font-medium mb-1">Pulse Glow</h4>
+             <p class="text-xs text-neutral-500 font-mono">.anim-pulse-subtle</p>
+           </div>
+        </div>
+        <div class="flex flex-col items-center gap-6 glass-card p-10 rounded-2xl reveal" style="transition-delay: 150ms;">
+           <div class="w-16 h-16 box bg-white/10 border border-white/20 rounded-xl anim-float shadow-lg backdrop-blur"></div>
+           <div>
+             <h4 class="text-white font-medium mb-1">Floating Levitation</h4>
+             <p class="text-xs text-neutral-500 font-mono">.anim-float</p>
+           </div>
+        </div>
+        <div class="flex flex-col items-center gap-6 glass-card p-10 rounded-2xl reveal" style="transition-delay: 300ms;">
+           <!-- Simulate a line beam -->
+           <div class="w-full h-16 flex items-center justify-center">
+             <svg width="200" height="40" viewBox="0 0 200 40">
+               <path d="M10,20 L190,20" class="stroke-white/20" stroke-width="2" fill="none"></path>
+               <path d="M10,20 L190,20" class="stroke-accent" stroke-width="2" fill="none" stroke-dasharray="20 180" style="animation: beam 2s linear infinite;"></path>
+             </svg>
+           </div>
+           <div>
+             <h4 class="text-white font-medium mb-1">Beam Stream</h4>
+             <p class="text-xs text-neutral-500 font-mono">.beam-live</p>
+           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-16 text-center reveal">
+    <div class="w-6 h-6 bg-accent rounded-md mx-auto mb-6 flex items-center justify-center opacity-50 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+      <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+    </div>
+    <p class="text-xs text-neutral-600 font-mono uppercase tracking-widest">Aether Protocol — Digital Matter Synthesis</p>
+    <div class="mt-4 text-[10px] text-neutral-700 font-mono">End of Document</div>
+  </footer>
+
+  <script>
+    // Reveal Observer for scroll animations
+    document.addEventListener("DOMContentLoaded", () => {
+      const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+      };
+      
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+      
+      const elementsToReveal = document.querySelectorAll('.reveal');
+      elementsToReveal.forEach(el => observer.observe(el));
+    });
+  </script>
+</body>
+</html>

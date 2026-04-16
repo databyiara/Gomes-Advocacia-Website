@@ -46,8 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (scrollyVideoContainer) {
                 const scrollyVideo = new ScrollyVideo({
                     scrollyVideoContainer: scrollyVideoContainer,
-                    src: 'assets/raw_files/video.mp4',
+                    src: 'assets/raw_files/video_trimmed.mp4',
                     trackScroll: false,
+                    cover: true,
                     transitionSpeed: 0
                 });
 

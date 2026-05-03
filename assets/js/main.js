@@ -40,40 +40,39 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }, 1000);
 
-            // 3. Cinematic ScrollyVideo Configuration
-            const scrollyVideoContainer = document.getElementById("parallax-video");
+            // 3. Cinematic Video Configuration (Native HTML5)
+            const heroVideo = document.getElementById("hero-native-video");
+            
+            if (heroVideo) {
+                const initParallaxScaling = () => {
+                    // Start video gracefully only when inside viewport (Avoid heavy bg rendering)
+                    ScrollTrigger.create({
+                        trigger: ".hero-scroll-container",
+                        start: "top bottom",
+                        end: "bottom top",
+                        onEnter: () => heroVideo.play().catch(e => console.log("Autoplay context", e)),
+                        onEnterBack: () => heroVideo.play().catch(() => {}),
+                        onLeave: () => heroVideo.pause(),
+                        onLeaveBack: () => heroVideo.pause()
+                    });
 
-            if (scrollyVideoContainer) {
-                const scrollyVideo = new ScrollyVideo({
-                    scrollyVideoContainer: scrollyVideoContainer,
-                    src: 'assets/raw_files/video_trimmed.mp4',
-                    trackScroll: false,
-                    cover: true,
-                    transitionSpeed: 0
-                });
-
-                const initScrubbing = () => {
-                    // Timeline linked to scroll progress via Scrub
+                    // Timeline linked to scroll progress via Scrub (Spatial Parallax Effect)
                     const scrollTl = gsap.timeline({
                         scrollTrigger: {
                             trigger: ".hero-scroll-container",
                             start: "top top",
-                            end: "bottom bottom",
-                            scrub: 1.2, // Cinematic smoothing
-                            onUpdate: (self) => {
-                                // Limita o progresso a 99.9% para evitar congelamento do vídeo
-                                let progress = self.progress;
-                                if (progress >= 1) progress = 0.999;
-                                if (scrollyVideo) scrollyVideo.setTargetTimePercent(progress);
-                            }
+                            end: "bottom top",
+                            scrub: true
                         }
                     });
 
-                    // Slightly scale video WITHOUT Y-axis translation to prevent elements from getting cut
-                    scrollTl.fromTo(".video-container",
-                        { scale: 1 },
-                        { scale: 1.04, ease: "none" }, 0
-                    );
+                    // Translate the video container on the Y axis via GPU 
+                    // This moves it down slightly slower than the scroll, creating premium depth
+                    scrollTl.to("#parallax-video", {
+                        yPercent: 15,
+                        ease: "none",
+                        force3D: true // Hardware acceleration
+                    }, 0);
 
                     // Fade out dark overlays slightly to make the video shine through clearer when scrolling
                     scrollTl.to(".dark-overlay-left, .dark-overlay-mobile",
@@ -85,16 +84,20 @@ document.addEventListener("DOMContentLoaded", () => {
                         y: -80,
                         opacity: 0,
                         filter: "blur(20px)",
+                        force3D: true, // Hardware acceleration
                         scrollTrigger: {
                             trigger: ".hero-scroll-container",
                             start: "top top",
                             end: "25% top",
-                            scrub: 1,
+                            scrub: 1, // Interpolation smoothing
                         }
                     });
                 };
 
-                initScrubbing();
+                // Defer setup until the next animation frame ensures DOM paints are resolved and composites ready
+                requestAnimationFrame(() => {
+                    initParallaxScaling();
+                });
             }
 
             // 4. Karaoke Effect

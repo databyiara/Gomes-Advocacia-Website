@@ -271,20 +271,23 @@ body {
             inset: 0;
             width: 100%;
             height: 100%;
-            will-change: transform;
-            transform-origin: center center;
             overflow: hidden;
             background-color: #020202;
             background-image: url('../raw_files/poster.jpg');
             background-size: cover;
             background-position: center center;
+            /* Enhance GPU rendering for the container */
+            will-change: transform;
         }
 
         #parallax-video {
-            width: 100%;
-            height: 100%;
-            transform: translate3d(0, 0, 0);
+            position: absolute;
+            top: -15%;
+            left: -5%;
+            width: 110%;
+            height: 130%;
             will-change: transform;
+            transform: translate3d(0, 0, 0);
         }
 
         #parallax-video video,
